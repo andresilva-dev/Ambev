@@ -1,4 +1,4 @@
-﻿namespace Ambev.DeveloperEvaluation.Application.Product.DeleteProduct
+﻿namespace Ambev.DeveloperEvaluation.Application.Products.DeleteProduct
 {
     /// <summary>
     /// Response model for DeleteProduct operation

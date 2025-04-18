@@ -1,4 +1,4 @@
-﻿namespace Ambev.DeveloperEvaluation.Application.Product.GetProduct
+﻿namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
 {
     public class GetProductResult
     {

@@ -1,12 +1,6 @@
-﻿using Ambev.DeveloperEvaluation.Application.Users.DeleteUser;
-using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
 
-namespace Ambev.DeveloperEvaluation.Application.Product.DeleteProduct
+namespace Ambev.DeveloperEvaluation.Application.Products.DeleteProduct
 {
     public class DeleteProductCommand : IRequest<DeleteProductResponse>
     {

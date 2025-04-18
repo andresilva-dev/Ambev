@@ -1,4 +1,4 @@
-﻿namespace Ambev.DeveloperEvaluation.Application.Product.CreateProduct
+﻿namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
 {
     /// <summary>
     /// Represents the response returned after successfully creating a new product.

@@ -1,6 +1,6 @@
-﻿using Ambev.DeveloperEvaluation.Application.Product.CreateProduct;
-using Ambev.DeveloperEvaluation.Application.Product.DeleteProduct;
-using Ambev.DeveloperEvaluation.Application.Product.GetProduct;
+﻿using Ambev.DeveloperEvaluation.Application.Products.GetProduct;
+using Ambev.DeveloperEvaluation.Application.Products.CreateProduct;
+using Ambev.DeveloperEvaluation.Application.Products.DeleteProduct;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Product.CreateProduct;
 using Ambev.DeveloperEvaluation.WebApi.Features.Product.DeleteProduct;

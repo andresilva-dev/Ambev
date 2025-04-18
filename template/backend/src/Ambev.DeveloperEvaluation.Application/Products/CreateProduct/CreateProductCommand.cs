@@ -1,9 +1,8 @@
-﻿using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
-using Ambev.DeveloperEvaluation.Common.Validation;
+﻿using Ambev.DeveloperEvaluation.Common.Validation;
 using FluentValidation;
 using MediatR;
 
-namespace Ambev.DeveloperEvaluation.Application.Product.CreateProduct
+namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
 {
     /// <summary>
     /// Command for creating a new product.

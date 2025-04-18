@@ -37,6 +37,16 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public decimal Total => Quantity * UnitPrice * (1 - DiscountPercentage);
 
         /// <summary>
+        /// Gets or sets the foreign key reference to the parent sale.
+        /// </summary>
+        public Guid SaleId { get; set; }
+
+        /// <summary>
+        /// Navigation property to the related sale.
+        /// </summary>
+        public Sale Sale { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SaleItem"/> class.
         /// Applies basic validation and discount policy.
         /// </summary>
