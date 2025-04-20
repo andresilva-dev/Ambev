@@ -14,6 +14,17 @@ namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Initializes a new instance of CreateProductHandler
+        /// </summary>
+        /// <param name="userRepository">The product repository</param>
+        /// <param name="mapper">The AutoMapper instance</param>
+        public CreateProductHandler(IMapper mapper, IProductRepository productRepository)
+        {
+            _mapper = mapper;
+            _productRepository = productRepository;
+        }
+
         public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
         {
             var validator = new CreateProductCommandValidator();

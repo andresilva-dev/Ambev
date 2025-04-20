@@ -21,9 +21,8 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.Property(s => s.SaleNumber).IsRequired().HasMaxLength(20);
             builder.Property(s => s.CustomerName).IsRequired().HasMaxLength(100);
             builder.Property(s => s.Branch).IsRequired().HasMaxLength(100);
-            builder.Property(s => s.Total).HasPrecision(10, 2);
             builder.Property(s => s.Date).IsRequired();
-
+            builder.Ignore(s => s.Total);
             builder.Property(s => s.Cancelled).IsRequired();
 
             builder.HasMany(s => s.Items)
