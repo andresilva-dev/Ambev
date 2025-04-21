@@ -34,6 +34,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
                 throw new ValidationException(validationResult.Errors);
 
             var product = _mapper.Map<Product>(command);
+            product.CreatedAt = DateTime.UtcNow;
 
             var createdProduct = await _productRepository.CreateAsync(product, cancellationToken);
             var result = _mapper.Map<CreateProductResult>(createdProduct);

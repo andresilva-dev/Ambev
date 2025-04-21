@@ -35,5 +35,19 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True if the product was deleted, false if not found</returns>
         Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retrieves all products as an <see cref="IQueryable{Product}"/> for further filtering and pagination.
+        /// </summary>
+        /// <returns>An <see cref="IQueryable{Product}"/> representing all products in the database.</returns>
+        IQueryable<Product> GetAllAsQueryable();
+
+        /// <summary>
+        /// Updates an existing product in the database.
+        /// </summary>
+        /// <param name="product">The product entity with updated values.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>The updated product entity.</returns>
+        Task<Product> UpdateAsync(Product product, CancellationToken cancellationToken);
     }
 }

@@ -8,6 +8,9 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Product.GetProduct;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Ambev.DeveloperEvaluation.Application.Products.GetProducts;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
+using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
 
 namespace YourApp.API.Controllers;
 
@@ -79,7 +82,7 @@ public class ProductsController : BaseController
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors);
 
-        var command = _mapper.Map<GetProductCommand>(request);
+        var command = _mapper.Map<GetProductCommand>(request.Id);
         var result = await _mediator.Send(command, cancellationToken);
 
         return Ok(new ApiResponseWithData<GetProductResponse>
@@ -116,6 +119,54 @@ public class ProductsController : BaseController
         {
             Success = true,
             Message = "Product deleted successfully"
+        });
+    }
+
+    /// <summary>
+    /// Retrieves a paginated list of products
+    /// </summary>
+    /// <param name="pageNumber">Page number (starting from 1)</param>
+    /// <param name="pageSize">Number of items per page</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Paginated list of products</returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(PaginatedResponse<GetProductResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+    {
+        var command = new GetProductsCommand(pageNumber, pageSize);
+        var result = await _mediator.Send(command, cancellationToken);
+
+        var response = await PaginatedList<GetProductResult>.CreateAsync(result, pageNumber, pageSize);
+
+
+        return OkPaginated(response);
+    }
+
+    /// <summary>
+    /// Updates an existing product
+    /// </summary>
+    /// <param name="request">The updated product data</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Success response with updated data</returns>
+    [HttpPut]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductRequest request, CancellationToken cancellationToken)
+    {
+        var validator = new UpdateProductRequestValidator();
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
+
+        var command = _mapper.Map<UpdateProductCommand>(request);
+        await _mediator.Send(command, cancellationToken);
+
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Message = "Product updated successfully"
         });
     }
 }

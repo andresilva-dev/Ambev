@@ -61,5 +61,27 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
         {
             return await _context.Products.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
         }
+
+        /// <summary>
+        /// Retrieves all products as an <see cref="IQueryable{Product}"/> for further filtering and pagination.
+        /// </summary>
+        /// <returns>An <see cref="IQueryable{Product}"/> representing all products in the database.</returns>
+        public IQueryable<Product> GetAllAsQueryable()
+        {
+            return _context.Products.AsNoTracking();
+        }
+
+        /// <summary>
+        /// Updates an existing product in the database.
+        /// </summary>
+        /// <param name="product">The product entity with updated values.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>The updated product entity.</returns>
+        public async Task<Product> UpdateAsync(Product product, CancellationToken cancellationToken)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync(cancellationToken);
+            return product;
+        }
     }
 }
