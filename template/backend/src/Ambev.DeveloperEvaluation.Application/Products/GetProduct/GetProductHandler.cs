@@ -32,7 +32,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
         /// <returns>The product details if found</returns>
         public async Task<GetProductResult> Handle(GetProductCommand request, CancellationToken cancellationToken)
         {
-            var validator = new GetProductValidator();
+            var validator = new GetProductCommandValidator();
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validationResult.IsValid)

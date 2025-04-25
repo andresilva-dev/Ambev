@@ -1,0 +1,75 @@
+﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Repositories;
+using AutoMapper;
+using FluentValidation;
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
+{
+    /// <summary>
+    /// Handler for processing CreateSaleCommand requests.
+    /// </summary>
+    public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleResult>
+    {
+        private readonly ISaleRepository _saleRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
+
+        /// <summary>
+        /// Initializes a new instance of CreateSaleHandler.
+        /// </summary>
+        /// <param name="mapper">The AutoMapper instance.</param>
+        /// <param name="saleRepository">The sale repository.</param>
+        public CreateSaleHandler(IMapper mapper, ISaleRepository saleRepository, 
+            IProductRepository productRepository, IUserRepository userRepository)
+        {
+            _mapper = mapper;
+            _saleRepository = saleRepository;
+            _productRepository = productRepository;
+            _userRepository = userRepository;
+        }
+
+        public async Task<CreateSaleResult> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
+        {
+            var validator = new CreateSaleCommandValidator();
+            var validationResult = await validator.ValidateAsync(command, cancellationToken);
+
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
+
+            var user = await _userRepository.GetByIdAsync(command.CustomerId, cancellationToken);
+            if (user == null)
+            {
+                throw new ValidationException($"User with ID '{command.CustomerId}' does not exist.");
+            }
+
+            var sale = new Sale
+            {
+                CustomerId = command.CustomerId,
+                Branch = command.Branch,
+                Date = DateTime.UtcNow
+            };
+
+            foreach (var item in command.Items)
+            {
+                var product = await _productRepository.GetByIdAsync(item.ProductId, cancellationToken);
+                if (product == null)
+                {
+                    throw new ValidationException($"Product with ID '{item.ProductId}' does not exist.");
+                }
+
+                sale.AddItem(item.ProductId, product.Name, item.Quantity, product.UnitPrice);
+            }
+
+            var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);
+            var result = _mapper.Map<CreateSaleResult>(createdSale);
+            return result;
+        }
+    }
+}

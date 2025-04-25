@@ -24,17 +24,12 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Gets or sets the date the sale was made.
         /// </summary>
-        public DateTime Date { get; set; } = DateTime.UtcNow;
+        public DateTime Date { get; set; }
 
         /// <summary>
         /// Gets or sets the ID of the customer.
         /// </summary>
-        public string CustomerId { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the customer name.
-        /// </summary>
-        public string CustomerName { get; set; } = string.Empty;
+        public Guid CustomerId { get; set; }
 
         /// <summary>
         /// Gets or sets the branch where the sale occurred.
@@ -56,6 +51,8 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// </summary>
         public decimal Total => Items.Sum(i => i.Total);
 
+        public User Customer { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the Sale class.
         /// </summary>
@@ -64,7 +61,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Adds an item to the sale with business rule validation.
         /// </summary>
-        public void AddItem(string productId, string productName, int quantity, decimal unitPrice)
+        public void AddItem(Guid productId, string productName, int quantity, decimal unitPrice)
         {
             decimal discount = 0;
             if (quantity >= 10) discount = 0.20m;

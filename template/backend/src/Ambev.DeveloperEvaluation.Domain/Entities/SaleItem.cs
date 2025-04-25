@@ -9,12 +9,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Gets or sets the identifier of the product.
         /// </summary>
-        public string ProductId { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the name of the product.
-        /// </summary>
-        public string ProductName { get; set; } = string.Empty;
+        public Guid ProductId { get; set; }
 
         /// <summary>
         /// Gets or sets the quantity of the product sold.
@@ -47,6 +42,11 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public Sale Sale { get; set; }
 
         /// <summary>
+        /// Navigation property to the related product.
+        /// </summary>
+        public Product Product { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SaleItem"/> class.
         /// Applies basic validation and discount policy.
         /// </summary>
@@ -56,7 +56,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <param name="unitPrice">The unit price of the product.</param>
         /// <param name="discountPercentage">The discount to apply.</param>
         /// <exception cref="ArgumentException">Thrown if quantity is invalid.</exception>
-        public SaleItem(string productId, string productName, int quantity, decimal unitPrice, decimal discountPercentage)
+        public SaleItem(Guid productId, string productName, int quantity, decimal unitPrice, decimal discountPercentage)
         {
             if (quantity <= 0)
                 throw new ArgumentException("Quantity must be greater than zero.");
@@ -65,7 +65,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
                 throw new ArgumentException("Cannot sell more than 20 items of the same product.");
 
             ProductId = productId;
-            ProductName = productName;
             Quantity = quantity;
             UnitPrice = unitPrice;
             DiscountPercentage = discountPercentage;

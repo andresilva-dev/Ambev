@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection.Emit;
 
 namespace Ambev.DeveloperEvaluation.ORM.Mapping
 {
@@ -19,7 +20,6 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.Property(s => s.Id).HasColumnType("uuid").HasDefaultValueSql("gen_random_uuid()");
 
             builder.Property(s => s.SaleNumber).IsRequired().HasMaxLength(20);
-            builder.Property(s => s.CustomerName).IsRequired().HasMaxLength(100);
             builder.Property(s => s.Branch).IsRequired().HasMaxLength(100);
             builder.Property(s => s.Date).IsRequired();
             builder.Ignore(s => s.Total);
@@ -29,6 +29,11 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
                    .WithOne(i => i.Sale)
                    .HasForeignKey(i => i.SaleId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(s => s.Customer)  // Relacionamento com a entidade User
+            .WithMany()               // Supondo que um usuário pode ter várias vendas
+            .HasForeignKey(s => s.CustomerId)  // Definindo CustomerId como chave estrangeira
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -14,11 +14,15 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.Property(i => i.Id).HasColumnType("uuid").HasDefaultValueSql("gen_random_uuid()");
 
             builder.Property(i => i.ProductId).IsRequired();
-            builder.Property(i => i.ProductName).IsRequired().HasMaxLength(100);
             builder.Property(i => i.Quantity).IsRequired();
             builder.Property(i => i.UnitPrice).HasPrecision(10, 2).IsRequired();
             builder.Property(i => i.DiscountPercentage).HasPrecision(5, 2).IsRequired();
             builder.Ignore(i => i.Total);
+
+            builder.HasOne(i => i.Product)                  // SaleItem tem um Product
+           .WithMany()                              // Um Product pode estar em vários SaleItems
+           .HasForeignKey(i => i.ProductId)         // Chave estrangeira em SaleItem
+           .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -13,9 +13,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Validation
             RuleFor(item => item.ProductId)
                 .NotEmpty().WithMessage("Product ID is required.");
 
-            RuleFor(item => item.ProductName)
-                .NotEmpty().WithMessage("Product name is required.");
-
             RuleFor(item => item.Quantity)
                 .GreaterThan(0).WithMessage("Quantity must be greater than zero.")
                 .LessThanOrEqualTo(20).WithMessage("Cannot sell more than 20 units of the same product.");

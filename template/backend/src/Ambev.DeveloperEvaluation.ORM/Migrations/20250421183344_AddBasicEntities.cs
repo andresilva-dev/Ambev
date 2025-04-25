@@ -47,14 +47,19 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     SaleNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CustomerId = table.Column<string>(type: "text", nullable: false),
-                    CustomerName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     Branch = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Cancelled = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sales", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sales_Users_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -62,8 +67,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    ProductId = table.Column<string>(type: "text", nullable: false),
-                    ProductName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
                     DiscountPercentage = table.Column<decimal>(type: "numeric(5,2)", precision: 5, scale: 2, nullable: false),
@@ -73,12 +77,28 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                 {
                     table.PrimaryKey("PK_SalesItems", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_SalesItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_SalesItems_Sales_SaleId",
                         column: x => x.SaleId,
                         principalTable: "Sales",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sales_CustomerId",
+                table: "Sales",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesItems_ProductId",
+                table: "SalesItems",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SalesItems_SaleId",
@@ -90,10 +110,10 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "SalesItems");
 
             migrationBuilder.DropTable(
-                name: "SalesItems");
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Sales");
