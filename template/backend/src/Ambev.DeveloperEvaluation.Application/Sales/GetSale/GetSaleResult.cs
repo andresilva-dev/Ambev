@@ -36,6 +36,16 @@
         public decimal Total { get; set; }
 
         /// <summary>
+        /// Total value of the sale, considering discounts.
+        /// </summary>
+        public decimal TotalDiscountsPercentage { get; set; }
+
+        /// <summary>
+        /// Indicates whether the sale has been cancelled.
+        /// </summary>
+        public bool Cancelled { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of sale items.
         /// </summary>
         public List<GetSaleItemResult> Items { get; set; } = new();

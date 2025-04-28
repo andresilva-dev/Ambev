@@ -93,5 +93,28 @@ namespace Ambev.DeveloperEvaluation.Infrastructure.Repositories
             await _context.SaveChangesAsync(cancellationToken);
             return sale;
         }
+
+        /// <inheritdoc/>
+        /// <summary>
+        /// Deletes all items associated with a given sale from the repository.
+        /// </summary>
+        /// <param name="saleId">The unique identifier of the sale</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public async Task DeleteItemsAsync(Guid saleId, CancellationToken cancellationToken)
+        {
+            var sale = await _context.Sales
+                .Include(s => s.Items)
+                .FirstOrDefaultAsync(s => s.Id == saleId, cancellationToken);
+
+            if (sale == null)
+            {
+                throw new InvalidOperationException($"Sale with ID '{saleId}' does not exist.");
+            }
+
+            _context.SaleItems.RemoveRange(sale.Items);
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

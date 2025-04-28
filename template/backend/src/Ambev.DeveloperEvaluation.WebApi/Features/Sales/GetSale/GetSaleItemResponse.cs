@@ -29,5 +29,10 @@
         /// Gets or sets the discount percentage applied (e.g., 0.10 = 10%).
         /// </summary>
         public decimal DiscountPercentage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TotalWithoutDiscounts.
+        /// </summary>
+        public decimal TotalWithoutDiscounts { get; set; }
     }
 }

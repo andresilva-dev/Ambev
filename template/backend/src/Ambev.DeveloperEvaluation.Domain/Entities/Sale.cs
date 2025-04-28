@@ -1,12 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Validation;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
@@ -39,7 +33,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Indicates whether the sale has been cancelled.
         /// </summary>
-        public bool Cancelled { get; private set; } = false;
+        public bool Cancelled { get; set; } = false;
 
         /// <summary>
         /// The list of items sold in this sale.
@@ -50,6 +44,16 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// Total value of the sale, considering discounts.
         /// </summary>
         public decimal Total => Items.Sum(i => i.Total);
+
+        /// <summary>
+        /// Total value of the sale, considering discounts.
+        /// </summary>
+        public decimal TotalWithoutDiscounts => Items.Sum(i => i.TotalWithoutDiscounts);
+
+        /// <summary>
+        /// Total value of the sale, considering discounts.
+        /// </summary>
+        public decimal TotalDiscountsPercentage => (1 - Math.Round((Total / TotalWithoutDiscounts), 2, MidpointRounding.AwayFromZero)) * 100; 
 
         public User Customer { get; set; }
 
@@ -64,18 +68,10 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public void AddItem(Guid productId, string productName, int quantity, decimal unitPrice)
         {
             decimal discount = 0;
-            if (quantity >= 10) discount = 0.20m;
-            else if (quantity >= 4) discount = 0.10m;
+            if (quantity >= 10) discount = 20m;
+            else if (quantity >= 4) discount = 10m;
 
             Items.Add(new SaleItem(productId, productName, quantity, unitPrice, discount));
-        }
-
-        /// <summary>
-        /// Cancels the sale.
-        /// </summary>
-        public void Cancel()
-        {
-            Cancelled = true;
         }
 
         /// <summary>

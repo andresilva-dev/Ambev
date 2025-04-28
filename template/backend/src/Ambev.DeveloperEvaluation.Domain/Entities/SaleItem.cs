@@ -1,6 +1,7 @@
 ﻿using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Validation;
+using System.Drawing;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
@@ -29,7 +30,12 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Gets the total value for this item after applying discount.
         /// </summary>
-        public decimal Total => Quantity * UnitPrice * (1 - DiscountPercentage);
+        public decimal Total => Quantity * UnitPrice * (1 - (DiscountPercentage / 100));
+
+        /// <summary>
+        /// Gets the total value for this item after applying discount.
+        /// </summary>
+        public decimal TotalWithoutDiscounts => Quantity * UnitPrice;
 
         /// <summary>
         /// Gets or sets the foreign key reference to the parent sale.

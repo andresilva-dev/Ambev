@@ -1,15 +1,14 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Repositories;
+﻿using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
 
-namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
+namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 {
     /// <summary>
-    /// Handler for processing CreateSaleCommand requests.
+    /// Handler for processing UpdateSaleCommand requests.
     /// </summary>
-    public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleResult>
+    public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, UpdateSaleResult>
     {
         private readonly ISaleRepository _saleRepository;
         private readonly IProductRepository _productRepository;
@@ -17,11 +16,9 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         private readonly IMapper _mapper;
 
         /// <summary>
-        /// Initializes a new instance of CreateSaleHandler.
+        /// Initializes a new instance of UpdateSaleHandler.
         /// </summary>
-        /// <param name="mapper">The AutoMapper instance.</param>
-        /// <param name="saleRepository">The sale repository.</param>
-        public CreateSaleHandler(IMapper mapper, ISaleRepository saleRepository, 
+        public UpdateSaleHandler(IMapper mapper, ISaleRepository saleRepository,
             IProductRepository productRepository, IUserRepository userRepository)
         {
             _mapper = mapper;
@@ -30,13 +27,19 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
             _userRepository = userRepository;
         }
 
-        public async Task<CreateSaleResult> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
+        public async Task<UpdateSaleResult> Handle(UpdateSaleCommand command, CancellationToken cancellationToken)
         {
-            var validator = new CreateSaleCommandValidator();
+            var validator = new UpdateSaleCommandValidator();
             var validationResult = await validator.ValidateAsync(command, cancellationToken);
 
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
+
+            var sale = await _saleRepository.GetByIdAsync(command.Id, cancellationToken);
+            if (sale == null)
+            {
+                throw new ValidationException($"Sale with ID '{command.Id}' does not exist.");
+            }
 
             var user = await _userRepository.GetByIdAsync(command.CustomerId, cancellationToken);
             if (user == null)
@@ -44,12 +47,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                 throw new ValidationException($"User with ID '{command.CustomerId}' does not exist.");
             }
 
-            var sale = new Sale
-            {
-                CustomerId = command.CustomerId,
-                Branch = command.Branch,
-                Date = DateTime.UtcNow
-            };
+            sale.CustomerId = command.CustomerId;
+            sale.Branch = command.Branch;
+            sale.Cancelled = command.Cancelled;
+
+            await _saleRepository.DeleteItemsAsync(command.Id, cancellationToken);
 
             foreach (var item in command.Items)
             {
@@ -62,8 +64,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                 sale.AddItem(item.ProductId, product.Name, item.Quantity, product.UnitPrice);
             }
 
-            var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);
-            var result = _mapper.Map<CreateSaleResult>(createdSale);
+            await _saleRepository.UpdateAsync(sale, cancellationToken);
+            var result = _mapper.Map<UpdateSaleResult>(sale);
             return result;
         }
     }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
+﻿namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
 {
     /// <summary>
     /// Represents a sale item in the sale result.
@@ -35,5 +29,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
         /// Gets or sets the discount percentage applied (e.g., 0.10 = 10%).
         /// </summary>
         public decimal DiscountPercentage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TotalWithoutDiscounts.
+        /// </summary>
+        public decimal TotalWithoutDiscounts { get; set; }
     }
 }
