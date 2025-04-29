@@ -55,7 +55,15 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Indicates whether the sale has been cancelled.
         /// </summary>
-        public bool Cancelled { get; set; } = false;
+        public bool Cancelled { get; private set; } = false;
+
+        /// <summary>
+        /// Cancels the saleItem and all its items.
+        /// </summary>
+        public void Cancel(bool cancel)
+        {
+            Cancelled = cancel;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SaleItem"/> class.

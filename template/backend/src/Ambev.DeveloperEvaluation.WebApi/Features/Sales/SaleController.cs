@@ -1,8 +1,10 @@
-﻿using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
+﻿using Ambev.DeveloperEvaluation.Application.Sales.CancelSaleItem;
+using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSales;
 using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 using Ambev.DeveloperEvaluation.WebApi.Common;
+using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CancelOrRestoreSaleItem;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.UpdateSale;
@@ -147,6 +149,33 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
                 Success = true,
                 Message = "Sale updated successfully",
                 Data = _mapper.Map<UpdateSaleResponse>(result)
+            });
+        }
+
+        /// <summary>
+        /// Cancels or restores cancellation of a sale item
+        /// </summary>
+        /// <param name="request">The request containing item ID and cancel flag</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Status of the operation</returns>
+        [HttpPut("items/cancel")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CancelOrRestoreSaleItem([FromBody] CancelSaleItemRequest request, CancellationToken cancellationToken)
+        {
+            var validator = new CancelSaleItemRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
+            var command = _mapper.Map<CancelSaleItemCommand>(request);
+            await _mediator.Send(command, cancellationToken);
+
+            return Ok(new ApiResponse
+            {
+                Success = true
             });
         }
 

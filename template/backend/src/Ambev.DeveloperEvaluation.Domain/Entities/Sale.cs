@@ -82,16 +82,13 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Cancels the sale and all its items.
         /// </summary>
-        public void Cancel()
+        public void Cancel(bool cancel)
         {
-            if (Cancelled)
-                return;
-
-            Cancelled = true;
+            Cancelled = cancel;
 
             foreach (var item in Items)
             {
-                item.Cancelled = true;
+                item.Cancel(cancel);
             }
         }
 
