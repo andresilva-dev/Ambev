@@ -1,12 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection.Emit;
 
 namespace Ambev.DeveloperEvaluation.ORM.Mapping
 {
@@ -30,9 +24,9 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
                    .HasForeignKey(i => i.SaleId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(s => s.Customer)  // Relacionamento com a entidade User
-            .WithMany()               // Supondo que um usuário pode ter várias vendas
-            .HasForeignKey(s => s.CustomerId)  // Definindo CustomerId como chave estrangeira
+            builder.HasOne(s => s.Customer) 
+            .WithMany()              
+            .HasForeignKey(s => s.CustomerId) 
             .OnDelete(DeleteBehavior.Cascade);
         }
     }

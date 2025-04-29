@@ -12,6 +12,7 @@ public class DefaultContext : DbContext
     public DbSet<Sale> Sales { get; set; } 
     public DbSet<SaleItem> SaleItems { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<Customer> Customers { get; set; }
 
     public DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
     {
@@ -20,8 +21,6 @@ public class DefaultContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DefaultContext).Assembly);
-        //modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        //base.OnModelCreating(modelBuilder);
     }
 }
 public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>

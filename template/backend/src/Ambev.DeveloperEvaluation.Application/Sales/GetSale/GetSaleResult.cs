@@ -18,7 +18,7 @@
         /// <summary>
         /// Gets or sets the customer Name related to the sale.
         /// </summary>
-        public string CustomerUsername { get; set; }
+        public string CustomerName { get; set; }
 
         /// <summary>
         /// Gets or sets the branch where the sale was made.

@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Repositories;
+﻿using Ambev.DeveloperEvaluation.Application.Customers.UpdateCustomer;
+using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
@@ -45,7 +46,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products.UpdateProduct
             existingProduct.Name = command.Name;
             existingProduct.Description = command.Description;
             existingProduct.UnitPrice = command.UnitPrice;
-            existingProduct.UpdatedAt = DateTime.UtcNow;  
+            existingProduct.UpdatedAt = DateTime.UtcNow;
 
             var updatedProduct = await _productRepository.UpdateAsync(existingProduct, cancellationToken);
 

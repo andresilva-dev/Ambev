@@ -18,7 +18,7 @@
         /// <summary>
         /// The name of the customer who made the purchase.
         /// </summary>
-        public string CustomerUsername { get; set; } = string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
 
         /// <summary>
         /// The branch where the sale occurred.

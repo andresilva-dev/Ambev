@@ -17,7 +17,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale
             CreateMap<Guid, GetSaleCommand>()
                 .ConstructUsing(id => new GetSaleCommand(id));
 
-            CreateMap<GetSaleResult, GetSaleResponse>().ForMember(dest => dest.CustomerUsername, opt => opt.MapFrom(src => src.CustomerUsername));
+            CreateMap<GetSaleResult, GetSaleResponse>().ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.CustomerName));
             CreateMap<GetSaleItemResult, GetSaleItemResponse>().ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.ProductName));
             CreateMap<Sale, GetSaleResult>().ReverseMap();
         }

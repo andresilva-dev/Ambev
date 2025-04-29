@@ -53,6 +53,11 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public Product Product { get; set; }
 
         /// <summary>
+        /// Indicates whether the sale has been cancelled.
+        /// </summary>
+        public bool Cancelled { get; set; } = false;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SaleItem"/> class.
         /// Applies basic validation and discount policy.
         /// </summary>

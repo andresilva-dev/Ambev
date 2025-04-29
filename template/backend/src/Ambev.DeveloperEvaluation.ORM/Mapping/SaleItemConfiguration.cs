@@ -17,11 +17,12 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.Property(i => i.Quantity).IsRequired();
             builder.Property(i => i.UnitPrice).HasPrecision(10, 2).IsRequired();
             builder.Property(i => i.DiscountPercentage).HasPrecision(5, 2).IsRequired();
+            builder.Property(i => i.Cancelled).IsRequired();
             builder.Ignore(i => i.Total);
 
-            builder.HasOne(i => i.Product)                  // SaleItem tem um Product
-           .WithMany()                              // Um Product pode estar em vários SaleItems
-           .HasForeignKey(i => i.ProductId)         // Chave estrangeira em SaleItem
+            builder.HasOne(i => i.Product)                
+           .WithMany()                              
+           .HasForeignKey(i => i.ProductId)        
            .OnDelete(DeleteBehavior.Restrict);
         }
     }

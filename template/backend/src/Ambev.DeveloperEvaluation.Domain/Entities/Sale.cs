@@ -55,7 +55,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// </summary>
         public decimal TotalDiscountsPercentage => (1 - Math.Round((Total / TotalWithoutDiscounts), 2, MidpointRounding.AwayFromZero)) * 100; 
 
-        public User Customer { get; set; }
+        public Customer Customer { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the Sale class.
