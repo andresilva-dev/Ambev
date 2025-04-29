@@ -49,7 +49,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 
             sale.CustomerId = command.CustomerId;
             sale.Branch = command.Branch;
-            sale.Cancelled = command.Cancelled;
+
+            if (command.Cancelled)
+            {
+                sale.Cancel();
+            }
 
             await _saleRepository.DeleteItemsAsync(command.Id, cancellationToken);
 

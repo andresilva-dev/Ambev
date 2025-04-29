@@ -33,7 +33,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Indicates whether the sale has been cancelled.
         /// </summary>
-        public bool Cancelled { get; set; } = false;
+        public bool Cancelled { get; private set; } = false;
 
         /// <summary>
         /// The list of items sold in this sale.
@@ -41,14 +41,19 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public List<SaleItem> Items { get; set; } = new();
 
         /// <summary>
-        /// Total value of the sale, considering discounts.
+        /// The list of items sold in this sale.
         /// </summary>
-        public decimal Total => Items.Sum(i => i.Total);
+        public IEnumerable<SaleItem> ItemsNotCancelled => Items.Where(i => i.Cancelled == false);
 
         /// <summary>
         /// Total value of the sale, considering discounts.
         /// </summary>
-        public decimal TotalWithoutDiscounts => Items.Sum(i => i.TotalWithoutDiscounts);
+        public decimal Total => ItemsNotCancelled.Sum(i => i.Total);
+
+        /// <summary>
+        /// Total value of the sale, considering discounts.
+        /// </summary>
+        public decimal TotalWithoutDiscounts => ItemsNotCancelled.Sum(i => i.TotalWithoutDiscounts);
 
         /// <summary>
         /// Total value of the sale, considering discounts.
@@ -72,6 +77,22 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
             else if (quantity >= 4) discount = 10m;
 
             Items.Add(new SaleItem(productId, productName, quantity, unitPrice, discount));
+        }
+
+        /// <summary>
+        /// Cancels the sale and all its items.
+        /// </summary>
+        public void Cancel()
+        {
+            if (Cancelled)
+                return;
+
+            Cancelled = true;
+
+            foreach (var item in Items)
+            {
+                item.Cancelled = true;
+            }
         }
 
         /// <summary>

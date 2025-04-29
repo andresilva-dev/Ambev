@@ -26,7 +26,7 @@
         public decimal UnitPrice { get; set; }
 
         /// <summary>
-        /// Gets or sets the discount percentage applied (e.g., 0.10 = 10%).
+        /// Gets or sets the discount percentage applied 
         /// </summary>
         public decimal DiscountPercentage { get; set; }
 
@@ -34,5 +34,10 @@
         /// Gets or sets the TotalWithoutDiscounts.
         /// </summary>
         public decimal TotalWithoutDiscounts { get; set; }
+
+        /// <summary>
+        /// Indicates whether the sale has been cancelled.
+        /// </summary>
+        public bool Cancelled { get; set; }
     }
 }
