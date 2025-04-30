@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ambev.DeveloperEvaluation.Application.Products.GetProducts;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
+using FluentValidation;
 
 namespace YourApp.API.Controllers;
 
@@ -46,21 +47,31 @@ public class ProductsController : BaseController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequest request, CancellationToken cancellationToken)
     {
-        var validator = new CreateProductRequestValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.Errors);
-
-        var command = _mapper.Map<CreateProductCommand>(request);
-        var result = await _mediator.Send(command, cancellationToken);
-
-        return Created(string.Empty, new ApiResponseWithData<CreateProductResponse>
+        try
         {
-            Success = true,
-            Message = "Product created successfully",
-            Data = _mapper.Map<CreateProductResponse>(result)
-        });
+            var validator = new CreateProductRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest("Occurred errors during the validation of the requested data.", validationResult.Errors);
+
+            var command = _mapper.Map<CreateProductCommand>(request);
+            var result = await _mediator.Send(command, cancellationToken);
+
+            return Created(
+                routeName: nameof(GetProductById),              
+                routeValues: new { id = result.Id },      
+                data: _mapper.Map<CreateProductResponse>(result)
+            );
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+        }
     }
 
     /// <summary>
@@ -69,28 +80,39 @@ public class ProductsController : BaseController
     /// <param name="id">The unique identifier of the product</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The product details if found</returns>
-    [HttpGet("{id}")]
+    [HttpGet("{id}", Name= "GetProductById")]
     [ProducesResponseType(typeof(ApiResponseWithData<GetProductResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetProduct([FromRoute] Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetProductById([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var request = new GetProductRequest { Id = id };
-        var validator = new GetProductRequestValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.Errors);
-
-        var command = _mapper.Map<GetProductCommand>(request.Id);
-        var result = await _mediator.Send(command, cancellationToken);
-
-        return Ok(new ApiResponseWithData<GetProductResponse>
+        try
         {
-            Success = true,
-            Message = "Product retrieved successfully",
-            Data = _mapper.Map<GetProductResponse>(result)
-        });
+            var request = new GetProductRequest { Id = id };
+            var validator = new GetProductRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest("Occurred errors during the validation of the requested data.", validationResult.Errors);
+
+            var command = _mapper.Map<GetProductCommand>(request.Id);
+            var result = await _mediator.Send(command, cancellationToken);
+
+            return Ok(new ApiResponseWithData<GetProductResponse>
+            {
+                Success = true,
+                Message = "Product retrieved successfully",
+                Data = _mapper.Map<GetProductResponse>(result)
+            });
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+        }
     }
 
     /// <summary>
@@ -105,21 +127,32 @@ public class ProductsController : BaseController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProduct([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var request = new DeleteProductRequest { Id = id };
-        var validator = new DeleteProductRequestValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.Errors);
-
-        var command = _mapper.Map<DeleteProductCommand>(request);
-        await _mediator.Send(command, cancellationToken);
-
-        return Ok(new ApiResponse
+        try
         {
-            Success = true,
-            Message = "Product deleted successfully"
-        });
+            var request = new DeleteProductRequest { Id = id };
+            var validator = new DeleteProductRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest("Occurred errors during the validation of the requested data.", validationResult.Errors);
+
+            var command = _mapper.Map<DeleteProductCommand>(request);
+            await _mediator.Send(command, cancellationToken);
+
+            return Ok(new ApiResponse
+            {
+                Success = true,
+                Message = "Product deleted successfully"
+            });
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+        }
     }
 
     /// <summary>
@@ -133,13 +166,26 @@ public class ProductsController : BaseController
     [ProducesResponseType(typeof(PaginatedResponse<GetProductResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
-        var command = new GetProductsCommand(pageNumber, pageSize);
-        var result = await _mediator.Send(command, cancellationToken);
+        try
+        {
+            var command = new GetProductsCommand(pageNumber, pageSize);
+            var result = await _mediator.Send(command, cancellationToken);
 
-        var response = await PaginatedList<GetProductResult>.CreateAsync(result, pageNumber, pageSize);
+            var response = await PaginatedList<GetProductResult>.CreateAsync(result, pageNumber, pageSize);
 
 
-        return OkPaginated(response);
+            return OkPaginated(response);
+
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+        }
+
     }
 
     /// <summary>
@@ -154,19 +200,31 @@ public class ProductsController : BaseController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductRequest request, CancellationToken cancellationToken)
     {
-        var validator = new UpdateProductRequestValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.Errors);
-
-        var command = _mapper.Map<UpdateProductCommand>(request);
-        await _mediator.Send(command, cancellationToken);
-
-        return Ok(new ApiResponse
+        try
         {
-            Success = true,
-            Message = "Product updated successfully"
-        });
+            var validator = new UpdateProductRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest("Occurred errors during the validation product.", validationResult.Errors);
+
+            var command = _mapper.Map<UpdateProductCommand>(request);
+            await _mediator.Send(command, cancellationToken);
+
+            return Ok(new ApiResponse
+            {
+                Success = true,
+                Message = "Product updated successfully"
+            });
+
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+        }
     }
 }

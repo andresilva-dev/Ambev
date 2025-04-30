@@ -4,14 +4,15 @@ using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSales;
 using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 using Ambev.DeveloperEvaluation.WebApi.Common;
+using Ambev.DeveloperEvaluation.WebApi.Features.Customers.CreateCustomer;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CancelOrRestoreSaleItem;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.UpdateSale;
 using AutoMapper;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 {
@@ -47,21 +48,31 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateSale([FromBody] CreateSaleRequest request, CancellationToken cancellationToken)
         {
-            var validator = new CreateSaleRequestValidator();
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-            if (!validationResult.IsValid)
-                return BadRequest(validationResult.Errors);
-
-            var command = _mapper.Map<CreateSaleCommand>(request);
-            var result = await _mediator.Send(command, cancellationToken);
-
-            return Created(string.Empty, new ApiResponseWithData<CreateSaleResponse>
+            try
             {
-                Success = true,
-                Message = "Sale created successfully",
-                Data = _mapper.Map<CreateSaleResponse>(result)
-            });
+                var validator = new CreateSaleRequestValidator();
+                var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+                if (!validationResult.IsValid)
+                    return BadRequest("Occurred errors during the validation of the requested data.", validationResult.Errors);
+
+                var command = _mapper.Map<CreateSaleCommand>(request);
+                var result = await _mediator.Send(command, cancellationToken);
+
+                return Created(
+                    routeName: nameof(GetSaleById),
+                    routeValues: new { id = result.Id },
+                    data: _mapper.Map<CreateSaleResponse>(result)
+                );
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+            }
         }
 
         /// <summary>
@@ -70,30 +81,41 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         /// <param name="id">The unique identifier of the sale</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The sale details if found</returns>
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetSaleById")]
         [ProducesResponseType(typeof(ApiResponseWithData<GetSaleResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetSale([FromRoute] Guid id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetSaleById([FromRoute] Guid id, CancellationToken cancellationToken)
         {
-            var request = new GetSaleRequest { Id = id };
-            var validator = new GetSaleRequestValidator();
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+            try
+            {
+                var request = new GetSaleRequest { Id = id };
+                var validator = new GetSaleRequestValidator();
+                var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
-            if (!validationResult.IsValid)
-                return BadRequest(validationResult.Errors);
+                if (!validationResult.IsValid)
+                    return BadRequest("Occurred errors during the validation of the requested data.", validationResult.Errors);
 
-            var command = _mapper.Map<GetSaleCommand>(request.Id);
-            var result = await _mediator.Send(command, cancellationToken);
+                var command = _mapper.Map<GetSaleCommand>(request.Id);
+                var result = await _mediator.Send(command, cancellationToken);
 
-            if (result == null)
-                return NotFound(new ApiResponse
-                {
-                    Success = false,
-                    Message = $"Sale with ID {id} not found"
-                });
+                if (result == null)
+                    return NotFound(new ApiResponse
+                    {
+                        Success = false,
+                        Message = $"Sale with ID {id} not found"
+                    });
 
-            return Ok(_mapper.Map<GetSaleResponse>(result), "Sale retrieved successfully");
+                return Ok(_mapper.Map<GetSaleResponse>(result), "Sale retrieved successfully");
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+            }
         }
 
         /// <summary>
@@ -107,12 +129,23 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         [ProducesResponseType(typeof(PaginatedResponse<GetSaleResponse>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSales([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            var command = new GetSalesCommand(pageNumber, pageSize);
-            var result = await _mediator.Send(command, cancellationToken);
+            try
+            {
+                var command = new GetSalesCommand(pageNumber, pageSize);
+                var result = await _mediator.Send(command, cancellationToken);
 
-            var response = await PaginatedList<GetSaleResult>.CreateAsync(result, pageNumber, pageSize);
+                var response = await PaginatedList<GetSaleResult>.CreateAsync(result, pageNumber, pageSize);
 
-            return OkPaginated(response);
+                return OkPaginated(response);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+            }
         }
 
         /// <summary>
@@ -128,28 +161,32 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateSale([FromBody] UpdateSaleRequest request, CancellationToken cancellationToken)
         {
-            var validator = new UpdateSaleRequestValidator();
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-            if (!validationResult.IsValid)
-                return BadRequest(validationResult.Errors);
-
-            var command = _mapper.Map<UpdateSaleCommand>(request);
-            var result = await _mediator.Send(command, cancellationToken);
-
-            if (result == null)
-                return NotFound(new ApiResponse
-                {
-                    Success = false,
-                    Message = $"Sale with ID {request.Id} not found"
-                });
-
-            return Ok(new ApiResponseWithData<UpdateSaleResponse>
+            try
             {
-                Success = true,
-                Message = "Sale updated successfully",
-                Data = _mapper.Map<UpdateSaleResponse>(result)
-            });
+                var validator = new UpdateSaleRequestValidator();
+                var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+                if (!validationResult.IsValid)
+                    return BadRequest("Occurred errors during the validation of the requested data.", validationResult.Errors);
+
+                var command = _mapper.Map<UpdateSaleCommand>(request);
+                var result = await _mediator.Send(command, cancellationToken);
+
+                return Ok(new ApiResponseWithData<UpdateSaleResponse>
+                {
+                    Success = true,
+                    Message = "Sale updated successfully",
+                    Data = _mapper.Map<UpdateSaleResponse>(result)
+                });
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+            }
         }
 
         /// <summary>
@@ -164,19 +201,28 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CancelOrRestoreSaleItem([FromBody] CancelSaleItemRequest request, CancellationToken cancellationToken)
         {
-            var validator = new CancelSaleItemRequestValidator();
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-            if (!validationResult.IsValid)
-                return BadRequest(validationResult.Errors);
-
-            var command = _mapper.Map<CancelSaleItemCommand>(request);
-            await _mediator.Send(command, cancellationToken);
-
-            return Ok(new ApiResponse
+            try
             {
-                Success = true
-            });
+                var validator = new CancelSaleItemRequestValidator();
+                var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+                if (!validationResult.IsValid)
+                    return BadRequest("Occurred errors during the validation of the requested data.", validationResult.Errors);
+
+                var command = _mapper.Map<CancelSaleItemCommand>(request);
+                await _mediator.Send(command, cancellationToken);
+
+                return Ok(new ApiResponse
+                {
+                    Success = true
+                });
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
 
     }
