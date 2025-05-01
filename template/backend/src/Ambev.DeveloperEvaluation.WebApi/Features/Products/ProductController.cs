@@ -12,6 +12,7 @@ using Ambev.DeveloperEvaluation.Application.Products.GetProducts;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace YourApp.API.Controllers;
 
@@ -19,6 +20,7 @@ namespace YourApp.API.Controllers;
 /// Controller for managing product operations
 /// </summary>
 [ApiController]
+[Authorize(Roles = "Admin,Manager")]
 [Route("api/[controller]")]
 public class ProductsController : BaseController
 {
@@ -163,6 +165,7 @@ public class ProductsController : BaseController
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Paginated list of products</returns>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PaginatedResponse<GetProductResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {

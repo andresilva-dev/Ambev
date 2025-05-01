@@ -12,6 +12,7 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Customers.UpdateCustomer;
 using Ambev.DeveloperEvaluation.Application.Customers.UpdateCustomer;
 using Ambev.DeveloperEvaluation.Application.Customers.GetCustomers;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Customers
 {
@@ -19,6 +20,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Customers
     /// Controller for managing customer operations
     /// </summary>
     [ApiController]
+    [Authorize(Roles = "Admin,Manager")]
     [Route("api/[controller]")]
     public class CustomersController : BaseController
     {

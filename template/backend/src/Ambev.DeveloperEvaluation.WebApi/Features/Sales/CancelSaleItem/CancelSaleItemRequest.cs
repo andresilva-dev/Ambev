@@ -8,7 +8,7 @@
         /// <summary>
         /// Gets or sets the ID of the sale item to be cancelled or restored.
         /// </summary>
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the item should be cancelled (true) or restored (false).

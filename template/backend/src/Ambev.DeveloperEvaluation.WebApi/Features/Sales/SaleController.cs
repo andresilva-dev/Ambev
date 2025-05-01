@@ -3,6 +3,7 @@ using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSales;
 using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Customers.CreateCustomer;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CancelOrRestoreSaleItem;
@@ -12,7 +13,9 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Sales.UpdateSale;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 {
@@ -20,6 +23,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
     /// Controller for managing sales operations
     /// </summary>
     [ApiController]
+    [Authorize(Roles = "Customer")]
     [Route("api/[controller]")]
     public class SaleController : BaseController
     {
@@ -82,6 +86,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The sale details if found</returns>
         [HttpGet("{id}", Name = "GetSaleById")]
+        [Authorize(Roles = "Admin,Manager")]
         [ProducesResponseType(typeof(ApiResponseWithData<GetSaleResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -126,6 +131,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Paginated list of sales</returns>
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
         [ProducesResponseType(typeof(PaginatedResponse<GetSaleResponse>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSales([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
         {
@@ -159,6 +165,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         [ProducesResponseType(typeof(ApiResponseWithData<UpdateSaleResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin,Manager,Customer")]
         public async Task<IActionResult> UpdateSale([FromBody] UpdateSaleRequest request, CancellationToken cancellationToken)
         {
             try
@@ -199,6 +206,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin,Manager,Customer")]
         public async Task<IActionResult> CancelOrRestoreSaleItem([FromBody] CancelSaleItemRequest request, CancellationToken cancellationToken)
         {
             try
@@ -217,12 +225,15 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
                     Success = true
                 });
             }
-            catch (Exception)
+            catch (ValidationException ex)
             {
-
-                throw;
+                return BadRequest(ex.Message);
             }
-            
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+            }
+
         }
 
     }

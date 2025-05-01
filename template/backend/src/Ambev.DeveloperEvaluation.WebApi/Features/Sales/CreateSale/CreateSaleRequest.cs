@@ -8,7 +8,7 @@
         /// <summary>
         /// Gets or sets the ID of the customer making the purchase.
         /// </summary>
-        public string CustomerId { get; set; } = string.Empty;
+        public Guid CustomerId { get; set; }
 
         /// <summary>
         /// Gets or sets the branch where the sale was made.
