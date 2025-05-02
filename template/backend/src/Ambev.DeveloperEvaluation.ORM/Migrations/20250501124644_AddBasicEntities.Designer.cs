@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ambev.DeveloperEvaluation.ORM.Migrations
 {
     [DbContext(typeof(DefaultContext))]
-    [Migration("20250429012113_AddBasicEntities")]
+    [Migration("20250501124644_AddBasicEntities")]
     partial class AddBasicEntities
     {
         /// <inheritdoc />
@@ -24,44 +24,6 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.Customer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<string>("Cpf")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("character varying(11)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Customers", (string)null);
-                });
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.Product", b =>
                 {
@@ -151,6 +113,9 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                     b.Property<Guid>("SaleId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("SaleId1")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
@@ -160,6 +125,8 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("SaleId");
+
+                    b.HasIndex("SaleId1");
 
                     b.ToTable("SalesItems", (string)null);
                 });
@@ -214,7 +181,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.Sale", b =>
                 {
-                    b.HasOne("Ambev.DeveloperEvaluation.Domain.Entities.Customer", "Customer")
+                    b.HasOne("Ambev.DeveloperEvaluation.Domain.Entities.User", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -237,6 +204,10 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Ambev.DeveloperEvaluation.Domain.Entities.Sale", null)
+                        .WithMany("ItemsNotCancelled")
+                        .HasForeignKey("SaleId1");
+
                     b.Navigation("Product");
 
                     b.Navigation("Sale");
@@ -245,6 +216,8 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.Sale", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("ItemsNotCancelled");
                 });
 #pragma warning restore 612, 618
         }

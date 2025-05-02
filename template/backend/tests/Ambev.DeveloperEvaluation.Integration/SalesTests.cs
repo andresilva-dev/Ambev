@@ -12,7 +12,6 @@ using Ambev.DeveloperEvaluation.ORM;
 using Microsoft.Extensions.DependencyInjection;
 using Ambev.DeveloperEvaluation.WebApi.Features.Auth.AuthenticateUserFeature;
 using Ambev.DeveloperEvaluation.WebApi.Features.Product.CreateProduct;
-using Ambev.DeveloperEvaluation.WebApi.Features.Customers.CreateCustomer;
 
 namespace MyProject.IntegrationTests.Controllers;
 
@@ -20,6 +19,7 @@ public class SalesTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
     private readonly DefaultContext _dbContext;
+    private Guid _customerId;
 
     public SalesTests(WebApplicationFactory<Program> factory)
     {
@@ -75,7 +75,7 @@ public class SalesTests : IClassFixture<WebApplicationFactory<Program>>
             Username = "Admin User",
             Email = "admin@domain.com",
             Password = "$2a$11$zbm4DWcKa6/NqU0fTRpHlesxIKyGzpznA6JOtyqsYQi8YNyzTKFNK",
-            Phone = "(11) 91234-5678",
+            Phone = "11912345678",
             Role = UserRole.Admin,
             Status = UserStatus.Active
         };
@@ -85,6 +85,7 @@ public class SalesTests : IClassFixture<WebApplicationFactory<Program>>
         );
 
         await _dbContext.SaveChangesAsync();
+        _customerId = userCustomer.Id;
     }
 
     [Fact(DisplayName = "POST /api/sale creates sale successfully")]
@@ -106,24 +107,9 @@ public class SalesTests : IClassFixture<WebApplicationFactory<Program>>
         var productJson = await response.Content.ReadFromJsonAsync<JsonElement>();
         var productId = productJson.GetProperty("data").GetProperty("id").GetGuid();
 
-        var createCustomerRequest = new CreateCustomerRequest
-        {
-            Name = "Cliente Teste Venda",
-            Cpf = "12460852088",
-            Email = "testeCustomer@gmail.com",
-            Status = CustomerStatus.Active
-        
-            
-        };
-
-        var customerResponse = await _client.PostAsJsonAsync("/api/customers", createCustomerRequest);
-        customerResponse.EnsureSuccessStatusCode();
-        var customerJson = await customerResponse.Content.ReadFromJsonAsync<JsonElement>();
-        var customerId = customerJson.GetProperty("data").GetProperty("id").GetGuid();
-
         var saleRequest = new CreateSaleRequest
         {
-            CustomerId = customerId,
+            CustomerId = _customerId,
             Branch = "Test Branch",
             Items = new List<CreateSaleItemRequest>
             {

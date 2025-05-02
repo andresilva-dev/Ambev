@@ -43,7 +43,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// The list of items sold in this sale.
         /// </summary>
-        public IEnumerable<SaleItem> ItemsNotCancelled => Items.Where(i => i.Cancelled == false);
+        public List<SaleItem> ItemsNotCancelled => Items.Where(i => i.Cancelled == false).ToList();
 
         /// <summary>
         /// Total value of the sale, considering discounts.
@@ -60,7 +60,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// </summary>
         public decimal TotalDiscountsPercentage => (1 - Math.Round((Total / TotalWithoutDiscounts), 2, MidpointRounding.AwayFromZero)) * 100; 
 
-        public Customer Customer { get; set; }
+        public User Customer { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the Sale class.

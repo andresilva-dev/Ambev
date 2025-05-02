@@ -1,4 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
@@ -42,6 +43,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
             if (user == null)
             {
                 throw new ValidationException($"User with ID '{command.CustomerId}' does not exist.");
+            }
+
+            if (!user.Role.Equals(UserRole.Customer))
+            {
+                throw new ValidationException($"User with ID '{command.CustomerId}' is not a customer.");
             }
 
             var sale = new Sale
