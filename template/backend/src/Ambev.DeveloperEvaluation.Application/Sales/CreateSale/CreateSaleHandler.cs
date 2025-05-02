@@ -1,5 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Enums;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
@@ -16,6 +17,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
         /// <summary>
         /// Initializes a new instance of CreateSaleHandler.
@@ -23,12 +25,13 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         /// <param name="mapper">The AutoMapper instance.</param>
         /// <param name="saleRepository">The sale repository.</param>
         public CreateSaleHandler(IMapper mapper, ISaleRepository saleRepository, 
-            IProductRepository productRepository, IUserRepository userRepository)
+            IProductRepository productRepository, IUserRepository userRepository, IMediator mediator)
         {
             _mapper = mapper;
             _saleRepository = saleRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
+            _mediator = mediator;
         }
 
         public async Task<CreateSaleResult> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
@@ -69,6 +72,9 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
             }
 
             var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);
+
+            await _mediator.Publish(new SaleCreatedEvent(sale.Id, DateTime.UtcNow), cancellationToken);
+
             var result = _mapper.Map<CreateSaleResult>(createdSale);
             return result;
         }

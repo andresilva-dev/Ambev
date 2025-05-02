@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Repositories;
+﻿using Ambev.DeveloperEvaluation.Domain.Events;
+using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
@@ -11,20 +12,20 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
     public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, UpdateSaleResult>
     {
         private readonly ISaleRepository _saleRepository;
-        private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
         /// <summary>
         /// Initializes a new instance of UpdateSaleHandler.
         /// </summary>
         public UpdateSaleHandler(IMapper mapper, ISaleRepository saleRepository,
-            IProductRepository productRepository, IUserRepository userRepository)
+            IProductRepository productRepository, IUserRepository userRepository, IMediator mediator)
         {
             _mapper = mapper;
             _saleRepository = saleRepository;
-            _productRepository = productRepository;
             _userRepository = userRepository;
+            _mediator = mediator;
         }
 
         public async Task<UpdateSaleResult> Handle(UpdateSaleCommand command, CancellationToken cancellationToken)
@@ -51,20 +52,19 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             sale.Branch = command.Branch;
             sale.Cancel(command.Cancelled);
 
-            await _saleRepository.DeleteItemsAsync(command.Id, cancellationToken);
+            await _saleRepository.UpdateAsync(sale, cancellationToken);
+            await _mediator.Publish(new SaleModifiedEvent(sale.Id, DateTime.UtcNow), cancellationToken);
 
-            foreach (var item in command.Items)
+            if (command.Cancelled)
             {
-                var product = await _productRepository.GetByIdAsync(item.ProductId, cancellationToken);
-                if (product == null)
+                foreach (var item in sale.Items)
                 {
-                    throw new ValidationException($"Product with ID '{item.ProductId}' does not exist.");
+                    await _mediator.Publish(new ItemCancelledEvent(sale.Id, item.Id), cancellationToken);
                 }
 
-                sale.AddItem(item.ProductId, product.Name, item.Quantity, product.UnitPrice);
+                await _mediator.Publish(new SaleCancelledEvent(sale.Id), cancellationToken);
             }
-
-            await _saleRepository.UpdateAsync(sale, cancellationToken);
+            
             var result = _mapper.Map<UpdateSaleResult>(sale);
             return result;
         }

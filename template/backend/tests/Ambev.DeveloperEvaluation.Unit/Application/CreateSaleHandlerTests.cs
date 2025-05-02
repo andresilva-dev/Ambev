@@ -8,6 +8,7 @@ using FluentAssertions;
 using NSubstitute;
 using Xunit;
 using FluentValidation;
+using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Unit.Application
 {
@@ -20,6 +21,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IMediator _mediator;
         private readonly CreateSaleHandler _handler;
 
         public CreateSaleHandlerTests()
@@ -28,7 +30,8 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
             _productRepository = Substitute.For<IProductRepository>();
             _userRepository = Substitute.For<IUserRepository>();
             _mapper = Substitute.For<IMapper>();
-            _handler = new CreateSaleHandler(_mapper, _saleRepository, _productRepository, _userRepository);
+            _mediator = Substitute.For<IMediator>();
+            _handler = new CreateSaleHandler(_mapper, _saleRepository, _productRepository, _userRepository, _mediator);
         }
 
         [Fact(DisplayName = "Given valid sale data When creating sale Then returns success response")]
@@ -53,7 +56,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
             };
 
             _userRepository.GetByIdAsync(command.CustomerId, Arg.Any<CancellationToken>())
-               .Returns(new User { Id = command.CustomerId });
+               .Returns(new User { Id = command.CustomerId,Role = UserRole.Customer });
 
             foreach (var item in command.Items)
             {
@@ -105,7 +108,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
             };
 
             _userRepository.GetByIdAsync(command.CustomerId, Arg.Any<CancellationToken>())
-                .Returns(new User { Id = command.CustomerId });
+                .Returns(new User { Id = command.CustomerId, Role = UserRole.Customer});
 
             foreach (var item in command.Items)
             {
@@ -193,7 +196,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         private void SetupUserAndProducts(CreateSaleCommand command, decimal unitPrice)
         {
             _userRepository.GetByIdAsync(command.CustomerId, Arg.Any<CancellationToken>())
-               .Returns(new User { Id = command.CustomerId });
+               .Returns(new User { Id = command.CustomerId , Role = UserRole.Customer});
 
             foreach (var item in command.Items)
             {
