@@ -34,4 +34,10 @@
     <Folder Include="Features\Users\UpdateUser\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Certificates\aspnetapp.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

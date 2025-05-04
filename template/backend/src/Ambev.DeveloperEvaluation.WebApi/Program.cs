@@ -36,7 +36,7 @@ public class Program
             {
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "API André",
+                    Title = "API Ambev",
                     Version = "v1"
                 });
 

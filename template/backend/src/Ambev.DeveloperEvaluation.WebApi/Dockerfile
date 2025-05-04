@@ -27,4 +27,8 @@ RUN dotnet publish "./Ambev.DeveloperEvaluation.WebApi.csproj" -c $BUILD_CONFIGU
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN mkdir -p /app/certificates
+COPY src/Ambev.DeveloperEvaluation.WebApi/Certificates/aspnetapp.pfx /app/certificates/
+
 ENTRYPOINT ["dotnet", "Ambev.DeveloperEvaluation.WebApi.dll"]

@@ -12,6 +12,8 @@ using Ambev.DeveloperEvaluation.ORM;
 using Microsoft.Extensions.DependencyInjection;
 using Ambev.DeveloperEvaluation.WebApi.Features.Auth.AuthenticateUserFeature;
 using Ambev.DeveloperEvaluation.WebApi.Features.Product.CreateProduct;
+using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
+using Ambev.DeveloperEvaluation.Tests.Commom;
 
 namespace MyProject.IntegrationTests.Controllers;
 
@@ -34,6 +36,8 @@ public class SalesTests : IClassFixture<WebApplicationFactory<Program>>
                 {
                     options.UseInMemoryDatabase("TestDb");
                 });
+
+                services.AddSingleton<ICacheService, FakeCacheService>();
             });
         });
 

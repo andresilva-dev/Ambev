@@ -12,6 +12,8 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Auth.AuthenticateUserFeature;
 using Ambev.DeveloperEvaluation.WebApi.Features.Product.CreateProduct;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
+using Ambev.DeveloperEvaluation.Tests.Commom;
 
 
 namespace Ambev.DeveloperEvaluation.Integration
@@ -34,6 +36,8 @@ namespace Ambev.DeveloperEvaluation.Integration
                     {
                         options.UseInMemoryDatabase("TestDb");
                     });
+
+                    services.AddSingleton<ICacheService, FakeCacheService>();
                 });
             });
 

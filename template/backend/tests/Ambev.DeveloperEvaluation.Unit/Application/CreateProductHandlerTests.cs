@@ -1,6 +1,8 @@
-﻿using Ambev.DeveloperEvaluation.Application.Products.CreateProduct;
+﻿using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
+using Ambev.DeveloperEvaluation.Application.Products.CreateProduct;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.Tests.Commom;
 using Ambev.DeveloperEvaluation.Unit.Application.TestData;
 using AutoMapper;
 using FluentAssertions;
@@ -18,6 +20,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         private readonly CreateProductHandler _handler;
+        private readonly ICacheService _cacheService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateProductHandlerTests"/> class.
@@ -26,7 +29,8 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         {
             _productRepository = Substitute.For<IProductRepository>();
             _mapper = Substitute.For<IMapper>();
-            //_handler = new CreateProductHandler(_mapper, _productRepository);
+            _cacheService = new FakeCacheService();
+            _handler = new CreateProductHandler(_mapper, _productRepository, _cacheService);
         }
 
         /// <summary>
