@@ -1,16 +1,19 @@
 using Ambev.DeveloperEvaluation.Application;
+using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
 using Ambev.DeveloperEvaluation.Common.HealthChecks;
 using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.IoC;
+using Ambev.DeveloperEvaluation.IoC.Services;
 using Ambev.DeveloperEvaluation.ORM;
 using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using StackExchange.Redis;
 
 namespace Ambev.DeveloperEvaluation.WebApi;
 
@@ -72,6 +75,12 @@ public class Program
                 )
             );
 
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var configuration = builder.Configuration.GetConnectionString("Redis");
+                return ConnectionMultiplexer.Connect(configuration!);
+            });
+
             builder.Services.AddJwtAuthentication(builder.Configuration);
 
             builder.RegisterDependencies();
@@ -93,11 +102,8 @@ public class Program
             var app = builder.Build();
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 

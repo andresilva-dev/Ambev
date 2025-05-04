@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
@@ -13,16 +14,18 @@ namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cache;
 
         /// <summary>
         /// Initializes a new instance of CreateProductHandler
         /// </summary>
         /// <param name="userRepository">The product repository</param>
         /// <param name="mapper">The AutoMapper instance</param>
-        public CreateProductHandler(IMapper mapper, IProductRepository productRepository)
+        public CreateProductHandler(IMapper mapper, IProductRepository productRepository, ICacheService cache)
         {
             _mapper = mapper;
             _productRepository = productRepository;
+            _cache = cache;
         }
 
         public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
@@ -37,6 +40,9 @@ namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
             product.CreatedAt = DateTime.UtcNow;
 
             var createdProduct = await _productRepository.CreateAsync(product, cancellationToken);
+
+            await _cache.SetAsync(createdProduct.Id.ToString(), createdProduct);
+
             var result = _mapper.Map<CreateProductResult>(createdProduct);
             return result;
         }

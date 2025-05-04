@@ -1,4 +1,6 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Repositories;
+﻿using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
+using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
@@ -9,6 +11,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cache;
 
         /// <summary>
         /// Initializes a new instance of GetProductHandler
@@ -18,10 +21,12 @@ namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
         /// <param name="validator">The validator for GetProductCommand</param>
         public GetProductHandler(
             IProductRepository productRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ICacheService cache)
         {
             _productRepository = productRepository;
             _mapper = mapper;
+            _cache = cache;
         }
 
         /// <summary>
@@ -37,6 +42,10 @@ namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
 
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
+
+            var cached = await _cache.GetAsync<Product>(request.Id.ToString());
+            if (cached != null) 
+                return _mapper.Map<GetProductResult>(cached);
 
             var product = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
             if (product == null)

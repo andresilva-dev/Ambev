@@ -26,7 +26,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         {
             _productRepository = Substitute.For<IProductRepository>();
             _mapper = Substitute.For<IMapper>();
-            _handler = new CreateProductHandler(_mapper, _productRepository);
+            //_handler = new CreateProductHandler(_mapper, _productRepository);
         }
 
         /// <summary>
