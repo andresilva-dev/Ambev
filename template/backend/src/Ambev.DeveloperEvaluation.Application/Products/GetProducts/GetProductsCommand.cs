@@ -12,7 +12,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products.GetProducts
     /// This command encapsulates pagination parameters to request a list of products.
     /// Validation is applied using <see cref="GetProductsCommandValidator"/> to ensure valid page parameters.
     /// </remarks>
-    public class GetProductsCommand : IRequest<IQueryable<GetProductResult>>
+    public class GetProductsCommand : IRequest<GetProductsResult>
     {
         /// <summary>
         /// Page number (starting from 1)

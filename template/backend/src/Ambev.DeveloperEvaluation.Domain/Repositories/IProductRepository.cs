@@ -35,7 +35,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
         /// Retrieves all products as an <see cref="IQueryable{Product}"/> for further filtering and pagination.
         /// </summary>
         /// <returns>An <see cref="IQueryable{Product}"/> representing all products in the database.</returns>
-        IQueryable<Product> GetAllAsQueryable();
+        IEnumerable<Product> GetAll();
 
         /// <summary>
         /// Updates an existing product in the database.

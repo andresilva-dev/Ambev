@@ -13,6 +13,7 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 
 namespace YourApp.API.Controllers;
 
@@ -20,7 +21,7 @@ namespace YourApp.API.Controllers;
 /// Controller for managing product operations
 /// </summary>
 [ApiController]
-[Authorize(Roles = "Admin,Manager")]
+//[Authorize(Roles = "Admin,Manager")]
 [Route("api/[controller]")]
 public class ProductsController : BaseController
 {
@@ -174,11 +175,10 @@ public class ProductsController : BaseController
             var command = new GetProductsCommand(pageNumber, pageSize);
             var result = await _mediator.Send(command, cancellationToken);
 
-            var response = await PaginatedList<GetProductResult>.CreateAsync(result, pageNumber, pageSize);
+            var paginatedList = new PaginatedList<GetProductResult>(result.Items.ToList()
+                , result.TotalCount, command.PageNumber, command.PageSize);
 
-
-            return OkPaginated(response);
-
+            return OkPaginated(paginatedList);
         }
         catch (ValidationException ex)
         {

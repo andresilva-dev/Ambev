@@ -21,6 +21,20 @@ public class DefaultContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DefaultContext).Assembly);
     }
+
+    public void ApplyMigrations()
+    {
+        try
+        {
+            Database.Migrate();
+            Console.WriteLine("Migrations applied.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+            throw;
+        }
+    }
 }
 public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
 {

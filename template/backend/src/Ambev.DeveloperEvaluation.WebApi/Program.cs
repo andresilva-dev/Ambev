@@ -1,12 +1,10 @@
 using Ambev.DeveloperEvaluation.Application;
-using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
 using Ambev.DeveloperEvaluation.Common.HealthChecks;
 using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.IoC;
-using Ambev.DeveloperEvaluation.IoC.Services;
 using Ambev.DeveloperEvaluation.ORM;
 using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
@@ -14,8 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using StackExchange.Redis;
-
-namespace Ambev.DeveloperEvaluation.WebApi;
 
 public class Program
 {
@@ -26,12 +22,24 @@ public class Program
             Log.Information("Starting web application");
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
             builder.AddDefaultLogging();
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
 
             builder.AddBasicHealthChecks();
+
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo
@@ -82,7 +90,6 @@ public class Program
             });
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
-
             builder.RegisterDependencies();
 
             builder.Services.AddAutoMapper(typeof(Program).Assembly, typeof(ApplicationLayer).Assembly);
@@ -91,21 +98,29 @@ public class Program
             {
                 cfg.RegisterServicesFromAssemblies(
                     typeof(ApplicationLayer).Assembly,
-                    typeof(Program).Assembly
+                    typeof(Program).Assembly,
+                    typeof(SaleCreatedEvent).Assembly
                 );
             });
-
-            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SaleCreatedEvent).Assembly));
 
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             var app = builder.Build();
+
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            // CORS deve vir antes de MapControllers e UseAuthorization
+            app.UseCors("AllowAll");
 
-            app.UseHttpsRedirection();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ambev");
+                c.RoutePrefix = string.Empty;
+            });
+
+            // Você pode desativar o redirecionamento HTTPS se quiser testar via HTTP puro
+            // app.UseHttpsRedirection(); // Remova se quiser permitir HTTP sem redirecionamento
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -113,6 +128,12 @@ public class Program
             app.UseBasicHealthChecks();
 
             app.MapControllers();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<DefaultContext>();
+                db.ApplyMigrations();
+            }
 
             app.Run();
         }

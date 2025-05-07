@@ -62,12 +62,12 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
         }
 
         /// <summary>
-        /// Retrieves all products as an <see cref="IQueryable{Product}"/> for further filtering and pagination.
+        /// Retrieves all products as an <see cref="IEnumerable{Product}"/> for further filtering and pagination.
         /// </summary>
-        /// <returns>An <see cref="IQueryable{Product}"/> representing all products in the database.</returns>
-        public IQueryable<Product> GetAllAsQueryable()
+        /// <returns>An <see cref="IEnumerable{Product}"/> representing all products in the database.</returns>
+        public IEnumerable<Product> GetAll()
         {
-            return _context.Products.AsNoTracking();
+            return _context.Products;
         }
 
         /// <summary>
