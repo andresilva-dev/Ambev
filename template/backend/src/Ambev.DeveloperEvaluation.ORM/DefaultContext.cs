@@ -26,6 +26,9 @@ public class DefaultContext : DbContext
     {
         try
         {
+            if (!Database.IsRelational())
+                return;
+
             Database.Migrate();
             Console.WriteLine("Migrations applied.");
         }

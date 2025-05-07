@@ -72,11 +72,8 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// </summary>
         public void AddItem(Guid productId, string productName, int quantity, decimal unitPrice)
         {
-            decimal discount = 0;
-            if (quantity >= 10) discount = 20m;
-            else if (quantity >= 4) discount = 10m;
-
-            Items.Add(new SaleItem(productId, productName, quantity, unitPrice, discount));
+            var item = SaleItemFactory.Create(productId, unitPrice, quantity);
+            Items.Add(item);
         }
 
         /// <summary>
