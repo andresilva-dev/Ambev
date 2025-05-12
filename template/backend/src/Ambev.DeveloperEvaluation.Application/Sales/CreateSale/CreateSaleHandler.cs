@@ -68,7 +68,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                     throw new ValidationException($"Product with ID '{item.ProductId}' does not exist.");
                 }
 
-                sale.AddItem(item.ProductId, product.Name, item.Quantity, product.UnitPrice);
+                sale.AddItem(item.ProductId, item.Quantity, product.UnitPrice, product.Name);
             }
 
             var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);

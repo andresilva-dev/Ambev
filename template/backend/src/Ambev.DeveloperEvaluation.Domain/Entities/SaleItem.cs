@@ -23,6 +23,11 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public decimal UnitPrice { get; set; }
 
         /// <summary>
+        /// Gets or sets the name of the product.
+        /// </summary>
+        public decimal ProductName { get; set; }
+
+        /// <summary>
         /// Gets or sets the discount percentage applied.
         /// </summary>
         public decimal DiscountPercentage { get; set; }

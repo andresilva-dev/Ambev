@@ -4,7 +4,6 @@ using System.Net.Http.Json;
 using Xunit;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Ambev.DeveloperEvaluation.WebApi;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +14,7 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Product.CreateProduct;
 using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
 using Ambev.DeveloperEvaluation.Tests.Commom;
 
-namespace MyProject.IntegrationTests.Controllers;
+namespace Ambev.DeveloperEvaluation.Integration;
 
 public class SalesTests : IClassFixture<WebApplicationFactory<Program>>
 {
@@ -34,7 +33,7 @@ public class SalesTests : IClassFixture<WebApplicationFactory<Program>>
 
                 services.AddDbContext<DefaultContext>(options =>
                 {
-                    options.UseInMemoryDatabase("TestDb");
+                    options.UseInMemoryDatabase("TestCreateSaleDb");
                 });
 
                 services.AddSingleton<ICacheService, FakeCacheService>();

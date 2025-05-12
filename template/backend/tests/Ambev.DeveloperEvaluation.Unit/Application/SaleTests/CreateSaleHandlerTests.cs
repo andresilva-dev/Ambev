@@ -10,7 +10,7 @@ using Xunit;
 using FluentValidation;
 using MediatR;
 
-namespace Ambev.DeveloperEvaluation.Unit.Application
+namespace Ambev.DeveloperEvaluation.Unit.Application.SaleTests
 {
     /// <summary>
     /// Contains unit tests for the <see cref="CreateSaleHandler"/> class.
@@ -69,7 +69,6 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
                     });
             }
 
-            _mapper.Map<Sale>(command).Returns(sale);
             _mapper.Map<CreateSaleResult>(sale).Returns(result);
             _saleRepository.CreateAsync(Arg.Any<Sale>(), Arg.Any<CancellationToken>())
                 .Returns(sale);
@@ -121,7 +120,6 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
                     });
             }
 
-            _mapper.Map<Sale>(Arg.Any<object>()).Returns(expectedSale);
             _mapper.Map<CreateSaleResult>(Arg.Any<Sale>())
                 .Returns(new CreateSaleResult { Id = expectedSale.Id });
 

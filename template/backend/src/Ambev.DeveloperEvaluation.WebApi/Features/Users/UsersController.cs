@@ -10,6 +10,8 @@ using Ambev.DeveloperEvaluation.Application.Users.GetUser;
 using Ambev.DeveloperEvaluation.Application.Users.DeleteUser;
 using Microsoft.AspNetCore.Authorization;
 using FluentValidation;
+using Ambev.DeveloperEvaluation.WebApi.Features.Users.UpdateUser;
+using Ambev.DeveloperEvaluation.Application.Users.UpdateUser;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Users;
 
@@ -144,6 +146,49 @@ public class UsersController : BaseController
             {
                 Success = true,
                 Message = "User deleted successfully"
+            });
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiResponse { Success = false, Message = $"Unexpected error: {ex.Message}" });
+        }
+    }
+
+    /// <summary>
+    /// Updates an existing user
+    /// </summary>
+    /// <param name="id">The ID of the user to update</param>
+    /// <param name="request">The updated user data</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Success response with updated user details</returns>
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(ApiResponseWithData<UpdateUserResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateUser([FromRoute] Guid id, [FromBody] UpdateUserRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            request.Id = id;
+
+            var validator = new UpdateUserRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
+            var command = _mapper.Map<UpdateUserCommand>(request);
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Ok(new ApiResponseWithData<UpdateUserResponse>
+            {
+                Success = true,
+                Message = "User updated successfully",
+                Data = _mapper.Map<UpdateUserResponse>(response)
             });
         }
         catch (ValidationException ex)

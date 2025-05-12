@@ -47,7 +47,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.TestData
         {
             var items = new List<CreateSaleItemCommand>
             {
-                GenerateValidItemCommand(quantity: new Random().Next(4, 9)) // 4 to 8 units
+                GenerateValidItemCommand(quantity: new Random().Next(4, 9))
             };
 
             return new CreateSaleCommand
@@ -65,7 +65,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.TestData
         {
             var items = new List<CreateSaleItemCommand>
             {
-                GenerateValidItemCommand(quantity: new Random().Next(10, 20)) // 10 to 19 units
+                GenerateValidItemCommand(quantity: new Random().Next(10, 20))
             };
 
             return new CreateSaleCommand
@@ -83,7 +83,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.TestData
         {
             var items = new List<CreateSaleItemCommand>
             {
-                GenerateValidItemCommand(quantity: new Random().Next(21, 30)) // Above 20
+                GenerateValidItemCommand(quantity: new Random().Next(21, 30))
             };
 
             return new CreateSaleCommand

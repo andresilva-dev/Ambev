@@ -14,9 +14,9 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Entities.TestData
             .RuleFor(si => si.UnitPrice, f => decimal.Parse(f.Commerce.Price(1, 1000)))
             .RuleFor(si => si.DiscountPercentage, (f, si) =>
             {
-                if (si.Quantity >= 10) return 20m;
-                if (si.Quantity >= 4) return 10m;
-                return 0m;
+                if (si.Quantity >= 10) return 20;
+                if (si.Quantity >= 4) return 10;
+                return 0;
             });
 
         private static readonly Faker<Sale> SaleFaker = new Faker<Sale>()
@@ -86,9 +86,9 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Entities.TestData
         /// <returns>Appropriate discount percentage.</returns>
         public static decimal GenerateDiscountForQuantity(int quantity)
         {
-            if (quantity >= 10) return 20m;
-            if (quantity >= 4) return 10m;
-            return 0m;
+            if (quantity >= 10) return 20;
+            if (quantity >= 4) return 10;
+            return 0;
         }
     }
 }

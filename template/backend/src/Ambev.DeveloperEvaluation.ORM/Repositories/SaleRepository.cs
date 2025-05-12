@@ -116,5 +116,29 @@ namespace Ambev.DeveloperEvaluation.Infrastructure.Repositories
 
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        /// <inheritdoc/>
+        /// <summary>
+        /// Returns true or false if exists relation between the user with sales.
+        /// </summary>
+        /// <param name="userID">The userId to check if there are sales related.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task<bool> ExistsSaleRelatedUserAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            return await _context.Sales.AnyAsync(s => s.CustomerId.Equals(userId), cancellationToken);
+        }
+
+        /// <summary>
+        /// Returns true or false if exists relation between the product with sales.
+        /// </summary>
+        /// <param name="productId">The productId to check if there are sales related.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task<bool> ExistsSaleRelatedProductAsync(Guid productId, CancellationToken cancellationToken)
+        {
+            return await _context.Sales
+                .AnyAsync(s => s.Items.Any(i => i.ProductId == productId), cancellationToken);
+        }
     }
 }

@@ -2,8 +2,11 @@
 {
     public static class SaleItemFactory
     {
-        public static SaleItem Create(Guid productId, decimal unitPrice, int quantity)
+        public static SaleItem Create(Guid productId, decimal unitPrice, int quantity, string productName)
         {
+            if (string.IsNullOrWhiteSpace(productName))
+                throw new ArgumentException("Name of product can't be null.");
+
             if (quantity <= 0)
                 throw new ArgumentException("Quantity must be greater than zero.");
 

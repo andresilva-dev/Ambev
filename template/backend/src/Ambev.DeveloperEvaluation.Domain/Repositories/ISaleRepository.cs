@@ -52,5 +52,21 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>A task representing the asynchronous delete operation.</returns>
         Task DeleteItemsAsync(Guid saleId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Returns true or false if exists relation between the user with sales.
+        /// </summary>
+        /// <param name="userId">The userId to check if there are sales related.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        Task<bool> ExistsSaleRelatedUserAsync(Guid userId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Returns true or false if exists relation between the product with sales.
+        /// </summary>
+        /// <param name="productId">The productId to check if there are sales related.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        Task<bool> ExistsSaleRelatedProductAsync(Guid productId, CancellationToken cancellationToken);
     }
 }

@@ -70,9 +70,9 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Adds an item to the sale with business rule validation.
         /// </summary>
-        public void AddItem(Guid productId, string productName, int quantity, decimal unitPrice)
+        public void AddItem(Guid productId, int quantity, decimal unitPrice, string productName)
         {
-            var item = SaleItemFactory.Create(productId, unitPrice, quantity);
+            var item = SaleItemFactory.Create(productId, unitPrice, quantity, productName);
             Items.Add(item);
         }
 

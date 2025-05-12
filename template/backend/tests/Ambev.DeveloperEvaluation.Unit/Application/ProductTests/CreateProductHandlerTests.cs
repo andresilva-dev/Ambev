@@ -10,7 +10,7 @@ using FluentValidation;
 using NSubstitute;
 using Xunit;
 
-namespace Ambev.DeveloperEvaluation.Unit.Application
+namespace Ambev.DeveloperEvaluation.Unit.Application.ProductTests
 {
     /// <summary>
     /// Contains unit tests for the <see cref="CreateProductHandler"/> class.
@@ -39,7 +39,6 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         [Fact(DisplayName = "Given valid product data When creating product Then returns success response")]
         public async Task Handle_ValidRequest_ReturnsSuccessResponse()
         {
-            // Given
             var command = CreateProductHandlerTestData.GenerateValidCommand();
             var product = new Product
             {
@@ -55,10 +54,8 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
             _productRepository.CreateAsync(Arg.Any<Product>(), Arg.Any<CancellationToken>())
                 .Returns(product);
 
-            // When
             var createProductResult = await _handler.Handle(command, CancellationToken.None);
 
-            // Then
             createProductResult.Should().NotBeNull();
             createProductResult.Id.Should().Be(product.Id);
             await _productRepository.Received(1).CreateAsync(Arg.Any<Product>(), Arg.Any<CancellationToken>());
@@ -70,13 +67,10 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         [Fact(DisplayName = "Given invalid product data When creating product Then throws validation exception")]
         public async Task Handle_InvalidRequest_ThrowsValidationException()
         {
-            // Given
-            var command = new CreateProductCommand(); // Empty command
+            var command = new CreateProductCommand();
 
-            // When
             var act = () => _handler.Handle(command, CancellationToken.None);
 
-            // Then
             await act.Should().ThrowAsync<ValidationException>();
         }
 
@@ -86,7 +80,6 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         [Fact(DisplayName = "Given valid command When handling Then maps command to product entity")]
         public async Task Handle_ValidRequest_MapsCommandToProduct()
         {
-            // Given
             var command = CreateProductHandlerTestData.GenerateValidCommand();
             var product = new Product
             {
@@ -97,14 +90,11 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
             };
 
             _mapper.Map<Product>(command).Returns(product);
-            _mapper.Map<CreateProductResult>(product).Returns(new CreateProductResult { Id = product.Id });
             _productRepository.CreateAsync(Arg.Any<Product>(), Arg.Any<CancellationToken>())
                 .Returns(product);
 
-            // When
             await _handler.Handle(command, CancellationToken.None);
 
-            // Then
             _mapper.Received(1).Map<Product>(Arg.Is<CreateProductCommand>(c =>
                 c.Name == command.Name &&
                 c.UnitPrice == command.UnitPrice && 

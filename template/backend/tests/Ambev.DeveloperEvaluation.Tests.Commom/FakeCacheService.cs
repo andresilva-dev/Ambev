@@ -56,5 +56,17 @@ namespace Ambev.DeveloperEvaluation.Tests.Commom
 
             return Task.FromResult(new List<T>());
         }
+
+        public Task UpdateAsync<T>(string key, T value, TimeSpan? expiration = null)
+        {
+            var typeKey = typeof(T).FullName!;
+            if (_store.TryGetValue(typeKey, out var typeStore))
+            {
+                var json = JsonSerializer.Serialize(value);
+                typeStore[key] = json;
+            }
+
+            return Task.CompletedTask;
+        }
     }
 }

@@ -16,7 +16,6 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Entities
         [Fact(DisplayName = "Validation should pass for valid sale data")]
         public void Given_ValidSaleData_When_Validated_Then_ShouldReturnValid()
         {
-            // Arrange
             var sale = new Sale
             {
                 CustomerId = Guid.NewGuid(),
@@ -24,12 +23,10 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Entities
             };
 
             var product = ProductTestData.GenerateValidProduct();
-            sale.AddItem(product.Id, product.Name, 5, product.UnitPrice); 
+            sale.AddItem(product.Id, 5, product.UnitPrice, product.Name); 
 
-            // Act
             var result = sale.Validate();
 
-            // Assert
             Assert.True(result.IsValid);
             Assert.Empty(result.Errors);
         }
@@ -40,17 +37,14 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Entities
         [Fact(DisplayName = "Validation should fail for sale with no items")]
         public void Given_SaleWithoutItems_When_Validated_Then_ShouldReturnInvalid()
         {
-            // Arrange
             var sale = new Sale
             {
                 CustomerId = Guid.NewGuid(),
                 Branch = "Test Branch"
             };
 
-            // Act
             var result = sale.Validate();
 
-            // Assert
             Assert.False(result.IsValid);
             Assert.NotEmpty(result.Errors);
         }
@@ -65,7 +59,6 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Entities
         [InlineData(100, "Cannot sell more than 20 items of the same product.")]
         public void Given_InvalidItemQuantity_When_AddItem_Then_ShouldThrowArgumentException(int invalidQuantity, string expectedMessage)
         {
-            // Arrange
             var sale = new Sale
             {
                 CustomerId = Guid.NewGuid(),
@@ -74,10 +67,9 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Entities
 
             var product = ProductTestData.GenerateValidProduct();
 
-            // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() =>
             {
-                sale.AddItem(product.Id, product.Name, invalidQuantity, product.UnitPrice);
+                sale.AddItem(product.Id, invalidQuantity, product.UnitPrice, product.Name);
             });
 
             Assert.Equal(expectedMessage, exception.Message);
