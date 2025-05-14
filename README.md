@@ -84,3 +84,65 @@ This section includes links to the detailed documentation for the different API 
 This section describes the overall structure and organization of the project files and directories. 
 
 See [Project Structure](/.doc/project-structure.md)
+
+
+## 🚀 Setup Instructions
+
+# Ambev Developer Evaluation Web API - Docker Setup Guide
+
+This guide explains how to build and run the **Ambev Developer Evaluation Web API** locally using Docker.
+
+---
+
+## 🧰 Requirements
+
+- [Docker](https://www.docker.com/products/docker-desktop) installed and running
+- Git or ZIP download of the project repository
+- Administrative privileges to execute commands
+
+---
+
+## 🚀 Steps to Build and Run the Application
+
+### 1. Open Command Prompt as Administrator
+
+To execute Docker commands properly, you must run the Command Prompt with elevated permissions:
+
+- Click on the **Start Menu**
+- Search for **Command Prompt**
+- Right-click it and choose **Run as administrator**
+
+### 2. Navigate to the Backend Directory
+
+Change to the project’s backend folder using the following command:
+
+```bash
+cd path\to\your\repo\Ambev\template\backend
+```
+### 3. Execute command to create image
+
+```bash
+docker build --no-cache -t ambevdeveloperevaluationwebapi .
+```
+### 4. Execute the command to create and initialize the containers
+
+```bash
+docker-compose up -d
+```
+<!--
+After executing the instructions, the API can be accessed at the following URLs:
+
+Swagger UI:
+
+http://localhost:8080/index.html
+https://localhost:8081/index.html
+-->
+
+## 🔐 Authentication
+
+Several endpoints require a Bearer token for access and is necessary to have a user to use it.
+
+### 📝 Register a New User
+
+```http
+POST /api/Users
