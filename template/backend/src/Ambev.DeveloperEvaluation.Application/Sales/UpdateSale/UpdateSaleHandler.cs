@@ -1,8 +1,10 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Events;
+﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
+using System.Runtime.CompilerServices;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 {
@@ -13,6 +15,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
     {
         private readonly ISaleRepository _saleRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
 
@@ -25,6 +28,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             _mapper = mapper;
             _saleRepository = saleRepository;
             _userRepository = userRepository;
+            _productRepository = productRepository;
             _mediator = mediator;
         }
 
@@ -50,8 +54,19 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 
             sale.CustomerId = command.CustomerId;
             sale.Branch = command.Branch;
-            sale.Cancel(command.Cancelled);
+            sale.Items.Clear();
 
+            foreach (var item in command.Items)
+            {
+                var product = await _productRepository.GetByIdAsync(item.ProductId);
+                if (product == null) 
+                {
+                    throw new ValidationException($"Product with ID '{item.ProductId}' does not exist.");
+                }
+                sale.AddItem(product.Id, item.Quantity, product.UnitPrice, product.Name);
+            }
+
+            sale.Cancel(command.Cancelled);
             await _saleRepository.UpdateAsync(sale, cancellationToken);
             await _mediator.Publish(new SaleModifiedEvent(sale.Id, DateTime.UtcNow), cancellationToken);
 

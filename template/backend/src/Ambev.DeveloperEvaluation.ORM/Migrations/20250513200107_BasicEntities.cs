@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Ambev.DeveloperEvaluation.ORM.Migrations
 {
     /// <inheritdoc />
-    public partial class AddBasicEntities : Migration
+    public partial class BasicEntities : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,18 +48,13 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                     SaleNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerName = table.Column<string>(type: "text", nullable: false),
                     Branch = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Cancelled = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sales", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Sales_Users_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,62 +65,37 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
+                    ProductName = table.Column<string>(type: "text", nullable: false),
                     DiscountPercentage = table.Column<decimal>(type: "numeric(5,2)", precision: 5, scale: 2, nullable: false),
+                    Total = table.Column<decimal>(type: "numeric", nullable: false),
                     SaleId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Cancelled = table.Column<bool>(type: "boolean", nullable: false),
-                    SaleId1 = table.Column<Guid>(type: "uuid", nullable: true)
+                    Cancelled = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SalesItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SalesItems_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_SalesItems_Sales_SaleId",
                         column: x => x.SaleId,
                         principalTable: "Sales",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SalesItems_Sales_SaleId1",
-                        column: x => x.SaleId1,
-                        principalTable: "Sales",
-                        principalColumn: "Id");
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Sales_CustomerId",
-                table: "Sales",
-                column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SalesItems_ProductId",
-                table: "SalesItems",
-                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SalesItems_SaleId",
                 table: "SalesItems",
                 column: "SaleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SalesItems_SaleId1",
-                table: "SalesItems",
-                column: "SaleId1");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "SalesItems");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "SalesItems");
 
             migrationBuilder.DropTable(
                 name: "Sales");

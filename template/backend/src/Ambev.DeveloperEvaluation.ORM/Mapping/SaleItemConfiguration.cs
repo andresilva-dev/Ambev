@@ -18,12 +18,13 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.Property(i => i.UnitPrice).HasPrecision(10, 2).IsRequired();
             builder.Property(i => i.DiscountPercentage).HasPrecision(5, 2).IsRequired();
             builder.Property(i => i.Cancelled).IsRequired();
+            builder.Property(i => i.ProductName).IsRequired();
             builder.Property(i => i.Total);
 
-            builder.HasOne(i => i.Product)                
-           .WithMany()                              
-           .HasForeignKey(i => i.ProductId)        
-           .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.Sale)
+            .WithMany(x => x.Items)
+            .HasForeignKey(x => x.SaleId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -1,4 +1,5 @@
 using Ambev.DeveloperEvaluation.Application;
+using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
 using Ambev.DeveloperEvaluation.Common.HealthChecks;
 using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
@@ -12,10 +13,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using StackExchange.Redis;
+using System;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         try
         {
@@ -109,7 +111,6 @@ public class Program
 
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
-            // CORS deve vir antes de MapControllers e UseAuthorization
             app.UseCors("AllowAll");
 
             app.UseSwagger();
@@ -118,9 +119,6 @@ public class Program
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ambev");
                 c.RoutePrefix = string.Empty;
             });
-
-            // Você pode desativar o redirecionamento HTTPS se quiser testar via HTTP puro
-            // app.UseHttpsRedirection(); // Remova se quiser permitir HTTP sem redirecionamento
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -133,6 +131,16 @@ public class Program
             {
                 var db = scope.ServiceProvider.GetRequiredService<DefaultContext>();
                 db.ApplyMigrations();
+
+                var services = scope.ServiceProvider;
+                var cacheService = services.GetRequiredService<ICacheService>();
+
+                var products = await db.Products.ToListAsync();
+
+                foreach (var product in products)
+                {
+                    await cacheService.SetAsync(product.Id.ToString(), product);
+                }
             }
 
             app.Run();

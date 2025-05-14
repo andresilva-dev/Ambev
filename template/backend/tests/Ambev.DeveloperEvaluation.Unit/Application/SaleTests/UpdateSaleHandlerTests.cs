@@ -29,7 +29,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.SaleTests
             _mapper = Substitute.For<IMapper>();
             _mediator = Substitute.For<IMediator>();
 
-            _handler = new UpdateSaleHandler(_mapper, _saleRepository, null, _userRepository, _mediator);
+            _handler = new UpdateSaleHandler(_mapper, _saleRepository, _productRepository, _userRepository, _mediator);
         }
 
         [Fact(DisplayName = "Given valid command When handling update Then returns expected result")]

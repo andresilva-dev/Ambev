@@ -13,7 +13,6 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using Ambev.DeveloperEvaluation.Domain.Entities;
 
 namespace YourApp.API.Controllers;
 
@@ -21,7 +20,7 @@ namespace YourApp.API.Controllers;
 /// Controller for managing product operations
 /// </summary>
 [ApiController]
-//[Authorize(Roles = "Admin,Manager")]
+[Authorize(Roles = "Admin,Manager")]
 [Route("api/[controller]")]
 public class ProductsController : BaseController
 {
@@ -147,6 +146,10 @@ public class ProductsController : BaseController
                 Success = true,
                 Message = "Product deleted successfully"
             });
+        }
+        catch(KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
         }
         catch (ValidationException ex)
         {

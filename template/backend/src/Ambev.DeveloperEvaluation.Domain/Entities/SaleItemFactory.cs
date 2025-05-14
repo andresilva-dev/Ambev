@@ -32,7 +32,8 @@
                 UnitPrice = unitPrice,
                 Quantity = quantity,
                 DiscountPercentage = discountPercentage,
-                Total = totalPrice               
+                Total = totalPrice,
+                ProductName = productName
             };
         }
     }

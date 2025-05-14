@@ -42,9 +42,7 @@ namespace Ambev.DeveloperEvaluation.Infrastructure.Repositories
         public async Task<Sale?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await _context.Sales
-                .Include(s => s.Customer)
                 .Include(s => s.Items)
-                    .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         }
 
@@ -75,8 +73,6 @@ namespace Ambev.DeveloperEvaluation.Infrastructure.Repositories
         {
             return _context.Sales
                 .Include(s => s.Items)
-                    .ThenInclude(i => i.Product)
-                .Include(s => s.Customer)
                 .AsQueryable();
         }
 

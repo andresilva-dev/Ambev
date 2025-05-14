@@ -13,10 +13,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
         /// </summary>
         public GetSaleProfile()
         {
-            CreateMap<Sale, GetSaleResult>()
-            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Username));
-            CreateMap<SaleItem, GetSaleItemResult>()
-            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name));
+            CreateMap<Sale, GetSaleResult>();
+            CreateMap<SaleItem, GetSaleItemResult>();
         }
     }
 }

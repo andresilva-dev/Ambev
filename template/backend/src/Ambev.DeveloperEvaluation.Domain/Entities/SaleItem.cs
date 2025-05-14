@@ -1,7 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Validation;
-using System.Drawing;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
@@ -25,7 +24,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Gets or sets the name of the product.
         /// </summary>
-        public decimal ProductName { get; set; }
+        public string ProductName { get; set; }
 
         /// <summary>
         /// Gets or sets the discount percentage applied.
@@ -51,11 +50,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// Navigation property to the related sale.
         /// </summary>
         public Sale Sale { get; set; }
-
-        /// <summary>
-        /// Navigation property to the related product.
-        /// </summary>
-        public Product Product { get; set; }
 
         /// <summary>
         /// Indicates whether the sale has been cancelled.

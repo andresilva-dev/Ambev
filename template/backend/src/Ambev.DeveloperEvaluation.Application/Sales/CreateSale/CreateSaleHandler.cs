@@ -55,12 +55,14 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 
             var sale = new Sale
             {
+                CustomerName = user.Username,
                 CustomerId = command.CustomerId,
                 Branch = command.Branch,
                 Date = DateTime.UtcNow
             };
 
-            foreach (var item in command.Items)
+            var items = command.Items.ToList();
+            foreach (var item in items)
             {
                 var product = await _productRepository.GetByIdAsync(item.ProductId, cancellationToken);
                 if (product == null)

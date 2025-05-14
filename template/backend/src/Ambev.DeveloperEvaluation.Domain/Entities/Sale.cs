@@ -25,6 +25,11 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// </summary>
         public Guid CustomerId { get; set; }
 
+        // <summary>
+        /// Gets or sets the name of the customer.
+        /// </summary>
+        public string CustomerName { get; set; }
+
         /// <summary>
         /// Gets or sets the branch where the sale occurred.
         /// </summary>
@@ -59,8 +64,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// Total value of the sale, considering discounts.
         /// </summary>
         public decimal TotalDiscountsPercentage => (1 - Math.Round((Total / TotalWithoutDiscounts), 2, MidpointRounding.AwayFromZero)) * 100; 
-
-        public User Customer { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the Sale class.
