@@ -128,14 +128,12 @@ docker build --no-cache -t ambevdeveloperevaluationwebapi .
 ```bash
 docker-compose up -d
 ```
-<!--
 After executing the instructions, the API can be accessed at the following URLs:
 
 Swagger UI:
 
 http://localhost:8080/index.html
 https://localhost:8081/index.html
--->
 
 ## 🔐 Authentication
 
@@ -145,3 +143,33 @@ Several endpoints require a Bearer token for access and is necessary to have a u
 
 ```http
 POST /api/Users
+
+### Endpoints references
+
+### Auth
+
+POST - /api/auth: (anonymous)
+
+### Products
+
+POST - /api/products: Admin, Manager  
+GET - /api/products/{id}: Admin, Manager  
+DELETE - /api/products/{id}: Admin, Manager  
+GET - /api/products: (anonymous)  
+PUT - /api/products: Admin, Manager  
+
+### Sales
+
+POST - /api/sale: Customer  
+GET - /api/sale/{id}: Admin, Manager  
+GET - /api/sale: Admin, Manager  
+PUT - /api/sale: Admin, Manager, Customer  
+PUT - /api/sale/items/cancel: Admin, Manager, Customer  
+
+### Users
+
+POST - /api/users: (anônimo)  
+GET - /api/users/{id}: Admin, Manager  
+DELETE - /api/users/{id}: Admin, Manager  
+PUT - /api/users: Admin, Manager  
+
