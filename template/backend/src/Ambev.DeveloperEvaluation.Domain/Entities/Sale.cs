@@ -1,12 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Validation;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
@@ -24,17 +18,17 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Gets or sets the date the sale was made.
         /// </summary>
-        public DateTime Date { get; set; } = DateTime.UtcNow;
+        public DateTime Date { get; set; }
 
         /// <summary>
         /// Gets or sets the ID of the customer.
         /// </summary>
-        public string CustomerId { get; set; } = string.Empty;
+        public Guid CustomerId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the customer name.
+        // <summary>
+        /// Gets or sets the name of the customer.
         /// </summary>
-        public string CustomerName { get; set; } = string.Empty;
+        public string CustomerName { get; set; }
 
         /// <summary>
         /// Gets or sets the branch where the sale occurred.
@@ -52,9 +46,24 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public List<SaleItem> Items { get; set; } = new();
 
         /// <summary>
+        /// The list of items sold in this sale.
+        /// </summary>
+        public List<SaleItem> ItemsNotCancelled => Items.Where(i => i.Cancelled == false).ToList();
+
+        /// <summary>
         /// Total value of the sale, considering discounts.
         /// </summary>
-        public decimal Total => Items.Sum(i => i.Total);
+        public decimal Total => ItemsNotCancelled.Sum(i => i.Total);
+
+        /// <summary>
+        /// Total value of the sale, considering discounts.
+        /// </summary>
+        public decimal TotalWithoutDiscounts => ItemsNotCancelled.Sum(i => i.TotalWithoutDiscounts);
+
+        /// <summary>
+        /// Total value of the sale, considering discounts.
+        /// </summary>
+        public decimal TotalDiscountsPercentage => (1 - Math.Round((Total / TotalWithoutDiscounts), 2, MidpointRounding.AwayFromZero)) * 100; 
 
         /// <summary>
         /// Initializes a new instance of the Sale class.
@@ -64,21 +73,23 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Adds an item to the sale with business rule validation.
         /// </summary>
-        public void AddItem(string productId, string productName, int quantity, decimal unitPrice)
+        public void AddItem(Guid productId, int quantity, decimal unitPrice, string productName)
         {
-            decimal discount = 0;
-            if (quantity >= 10) discount = 0.20m;
-            else if (quantity >= 4) discount = 0.10m;
-
-            Items.Add(new SaleItem(productId, productName, quantity, unitPrice, discount));
+            var item = SaleItemFactory.Create(productId, unitPrice, quantity, productName);
+            Items.Add(item);
         }
 
         /// <summary>
-        /// Cancels the sale.
+        /// Cancels the sale and all its items.
         /// </summary>
-        public void Cancel()
+        public void Cancel(bool cancel)
         {
-            Cancelled = true;
+            Cancelled = cancel;
+
+            foreach (var item in Items)
+            {
+                item.Cancel(cancel);
+            }
         }
 
         /// <summary>

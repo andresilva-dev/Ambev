@@ -14,11 +14,17 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping
             builder.Property(i => i.Id).HasColumnType("uuid").HasDefaultValueSql("gen_random_uuid()");
 
             builder.Property(i => i.ProductId).IsRequired();
-            builder.Property(i => i.ProductName).IsRequired().HasMaxLength(100);
             builder.Property(i => i.Quantity).IsRequired();
             builder.Property(i => i.UnitPrice).HasPrecision(10, 2).IsRequired();
             builder.Property(i => i.DiscountPercentage).HasPrecision(5, 2).IsRequired();
-            builder.Property(i => i.Total).HasPrecision(10, 2).IsRequired();
+            builder.Property(i => i.Cancelled).IsRequired();
+            builder.Property(i => i.ProductName).IsRequired();
+            builder.Property(i => i.Total);
+
+            builder.HasOne(x => x.Sale)
+            .WithMany(x => x.Items)
+            .HasForeignKey(x => x.SaleId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

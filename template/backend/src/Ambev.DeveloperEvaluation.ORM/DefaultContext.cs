@@ -19,8 +19,24 @@ public class DefaultContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DefaultContext).Assembly);
+    }
+
+    public void ApplyMigrations()
+    {
+        try
+        {
+            if (!Database.IsRelational())
+                return;
+
+            Database.Migrate();
+            Console.WriteLine("Migrations applied.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+            throw;
+        }
     }
 }
 public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
@@ -37,7 +53,7 @@ public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
 
         builder.UseNpgsql(
                connectionString,
-               b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.WebApi")
+               b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
         );
 
         return new DefaultContext(builder.Options);

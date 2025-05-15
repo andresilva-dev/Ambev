@@ -8,7 +8,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Validation
         public SaleValidator()
         {
             RuleFor(s => s.CustomerId).NotEmpty();
-            RuleFor(s => s.CustomerName).NotEmpty();
             RuleFor(s => s.Branch).NotEmpty();
             RuleFor(s => s.Items).NotEmpty();
         }

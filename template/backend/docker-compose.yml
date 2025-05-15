@@ -1,50 +1,67 @@
 version: '3.8'
 
 services:
+  ambev.developerevaluation.database:
+    container_name: ambev_developer_evaluation_database
+    image: postgres:13
+    environment:
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: ev@luAt10n
+      POSTGRES_DB: developer_evaluation
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - developer_network
+
+  ambev.developerevaluation.nosql:
+    container_name: ambev_developer_evaluation_nosql
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: developer
+      MONGO_INITDB_ROOT_PASSWORD: ev@luAt10n
+    ports:
+      - "27017:27017"
+    networks:
+      - developer_network 
+
+  ambev.developerevaluation.cache:
+    container_name: ambev_developer_evaluation_cache
+    image: redis:7.4.1-alpine
+    command: redis-server --requirepass teste123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - developer_network
+       
   ambev.developerevaluation.webapi:
     container_name: ambev_developer_evaluation_webapi
-    image: ${DOCKER_REGISTRY-}ambevdeveloperevaluationwebapi
-    build:
-      context: .
-      dockerfile: src/Ambev.DeveloperEvaluation.WebApi/Dockerfile
+    image: ambevdeveloperevaluationwebapi:latest
+    # image: ${DOCKER_REGISTRY-}ambevdeveloperevaluationwebapi
+    # build:
+    #   context: .
+    #   dockerfile: src/Ambev.DeveloperEvaluation.WebApi/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
     ports:
-      - "8080"
-      - "8081"
+      - "8080:8080"
+      - "8081:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    networks:
+      - developer_network
 
-  ambev.developerevaluation.database:
-    container_name: ambev_developer_evaluation_database
-    image: postgres:13
+volumes:
+  pgdata:
+  redisdata:
 
-    environment:
-      POSTGRES_DB: developer_evaluation
-      POSTGRES_USER: developer
-      POSTGRES_PASSWORD: ev@luAt10n
-    ports:
-      - "5432"
-    restart: unless-stopped
-
-  ambev.developerevaluation.nosql:
-    container_name: ambev_developer_evaluation_nosql 
-    image: mongo:8.0    
-    environment:
-        MONGO_INITDB_ROOT_USERNAME: developer
-        MONGO_INITDB_ROOT_PASSWORD: ev@luAt10n
-    ports:
-      - "27017"
-
-  ambev.developerevaluation.cache:
-    container_name: ambev_developer_evaluation_cache 
-    image: redis:7.4.1-alpine     
-    command: redis-server --requirepass ev@luAt10n
-    environment:
-       MONGO_INITDB_ROOT_USERNAME: developer
-       MONGO_INITDB_ROOT_PASSWORD: ev@luAt10n
-    ports:
-       - "6379"
+networks:
+  developer_network:
+    driver: bridge
