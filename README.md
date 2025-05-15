@@ -88,7 +88,7 @@ See [Project Structure](/.doc/project-structure.md)
 
 ## 🚀 Setup Instructions
 
-# Ambev Developer Evaluation Web API - Docker Setup Guide
+### Ambev Developer Evaluation Web API - Docker Setup Guide
 
 This guide explains how to build and run the **Ambev Developer Evaluation Web API** locally using Docker.
 
@@ -96,9 +96,8 @@ This guide explains how to build and run the **Ambev Developer Evaluation Web AP
 
 ## 🧰 Requirements
 
-- [Docker](https://www.docker.com/products/docker-desktop) installed and running
-- Git or ZIP download of the project repository
-- Administrative privileges to execute commands
+- Docker (para containerização e execução em ambiente isolado)
+- .NET 8.0 SDK
 
 ---
 
