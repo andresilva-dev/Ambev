@@ -143,6 +143,7 @@ Several endpoints require a Bearer token for access and is necessary to have a u
 
 ```http
 POST /api/Users
+```
 
 ### Endpoints references
 
