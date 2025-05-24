@@ -128,7 +128,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Paginated list of sales</returns>
         [HttpGet]
-        //[Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         [ProducesResponseType(typeof(PaginatedResponse<GetSaleResponse>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSales([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
         {

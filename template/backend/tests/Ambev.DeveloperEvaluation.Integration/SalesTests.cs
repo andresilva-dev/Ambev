@@ -13,6 +13,7 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Auth.AuthenticateUserFeature;
 using Ambev.DeveloperEvaluation.WebApi.Features.Product.CreateProduct;
 using Ambev.DeveloperEvaluation.Application.Interfaces.Services;
 using Ambev.DeveloperEvaluation.Tests.Commom;
+using Ambev.DeveloperEvaluation.Domain.Services;
 
 namespace Ambev.DeveloperEvaluation.Integration;
 
@@ -35,6 +36,11 @@ public class SalesTests : IClassFixture<WebApplicationFactory<Program>>
                 {
                     options.UseInMemoryDatabase("TestCreateSaleDb");
                 });
+
+                var mongoLoggerDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IEventLogger));
+                if (mongoLoggerDescriptor != null) services.Remove(mongoLoggerDescriptor);
+
+                services.AddSingleton<IEventLogger, FakeMongoEventLogger>();
 
                 services.AddSingleton<ICacheService, FakeCacheService>();
             });
