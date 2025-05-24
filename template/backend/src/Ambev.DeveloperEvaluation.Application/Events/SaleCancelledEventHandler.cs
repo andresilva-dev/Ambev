@@ -1,11 +1,23 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Events;
+using Ambev.DeveloperEvaluation.Domain.Services;
 using MediatR;
 
 public class SaleCancelledEventHandler : INotificationHandler<SaleCancelledEvent>
 {
-    public Task Handle(SaleCancelledEvent notification, CancellationToken cancellationToken)
+    private readonly IEventLogger _eventLogger;
+
+    public SaleCancelledEventHandler(IEventLogger eventLogger)
+    {
+        _eventLogger = eventLogger;
+    }
+
+    public async Task Handle(SaleCancelledEvent notification, CancellationToken cancellationToken)
     {
         Console.WriteLine($"[EVENT] Sale cancelled: {notification.Id}");
-        return Task.CompletedTask;
+
+        await _eventLogger.LogAsync(
+            eventType: nameof(SaleCancelledEventHandler),
+            id: notification.Id.ToString(),
+            cancellationToken);
     }
 }
